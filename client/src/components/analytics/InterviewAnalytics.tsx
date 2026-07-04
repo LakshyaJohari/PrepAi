@@ -21,9 +21,6 @@ interface Turn {
 
 const card = "bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5"
 
-function AnimatedCounter({ value }: { value: number }) {
-  return <span>{value}</span>
-}
 
 function ReadinessMeter({ score }: { score: number }) {
   const color = score >= 75 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444'
