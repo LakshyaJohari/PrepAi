@@ -39,51 +39,51 @@ export default function ContestSchedule() {
   if (success) return (
     <div className="max-w-xl mx-auto text-center py-20">
       <div className="text-6xl mb-4">🏆</div>
-      <h2 className="text-2xl font-black text-white mb-2">Contest Scheduled!</h2>
-      <p className="text-[#666666]">Redirecting to contest page...</p>
+      <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Contest Scheduled!</h2>
+      <p className="text-[var(--text-secondary)]">Redirecting to contest page...</p>
     </div>
   )
 
   return (
-    <div className="max-w-xl mx-auto space-y-6">
+    <div className="max-w-xl mx-auto space-y-4">
       <div>
-        <h1 className="text-3xl font-black text-white">Schedule Contest</h1>
-        <p className="text-[#666666] text-sm mt-1">Create a new coding contest. Problems are auto-selected.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Schedule Contest</h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">Create a new coding contest. Problems are auto-selected.</p>
       </div>
 
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-6 space-y-4">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 space-y-4">
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl p-3">
+          <div className="bg-[var(--danger-dim)] border border-[var(--danger-border)] text-[var(--danger)] text-sm rounded-[var(--radius-md)] p-3">
             {error}
           </div>
         )}
 
         <div>
-          <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
             Contest Title *
           </label>
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white placeholder-[#444444]"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
             placeholder="e.g. PrepAI Weekly Contest 3"
           />
         </div>
 
         <div>
-          <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
             Description (optional)
           </label>
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white placeholder-[#444444] resize-none h-20"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)] resize-none h-20"
             placeholder="Brief description of the contest..."
           />
         </div>
 
         <div>
-          <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
             Start Time *
           </label>
           <input
@@ -91,29 +91,29 @@ export default function ContestSchedule() {
             value={startTime}
             min={minDateTime}
             onChange={e => setStartTime(e.target.value)}
-            className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150"
           />
-          <p className="text-xs text-[#444444] mt-1">Contest runs for 90 minutes from start time</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">Contest runs for 90 minutes from start time</p>
         </div>
 
         {/* Preview */}
         {startTime && (
-          <div className="bg-[#111111] rounded-xl p-4 space-y-2">
-            <p className="text-xs text-[#555555] uppercase tracking-widest mb-2">Preview</p>
+          <div className="bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-4 space-y-2 border border-[var(--border-subtle)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] mb-2">Preview</p>
             <div className="flex items-center gap-2 text-sm">
-              <Calendar size={14} className="text-indigo-400" />
-              <span className="text-white">Starts: {new Date(startTime).toLocaleString()}</span>
+              <Calendar size={14} className="text-[var(--accent)]" />
+              <span className="text-[var(--text-primary)]">Starts: {new Date(startTime).toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <Clock size={14} className="text-amber-400" />
-              <span className="text-white">Ends: {new Date(new Date(startTime).getTime() + 90 * 60 * 1000).toLocaleString()}</span>
+              <Clock size={14} className="text-[var(--warning)]" />
+              <span className="text-[var(--text-primary)]">Ends: {new Date(new Date(startTime).getTime() + 90 * 60 * 1000).toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <Trophy size={14} className="text-teal-400" />
-              <span className="text-white">4 problems auto-selected (1 Easy, 2 Medium, 1 Hard)</span>
+              <Trophy size={14} className="text-[var(--teal)]" />
+              <span className="text-[var(--text-primary)]">4 problems auto-selected (1 Easy, 2 Medium, 1 Hard)</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${new Date(startTime) <= new Date() ? 'bg-green-400/10 text-green-400' : 'bg-blue-400/10 text-blue-400'}`}>
+              <span className={`badge ${new Date(startTime) <= new Date() ? 'badge-active' : 'badge-upcoming'}`}>
                 {new Date(startTime) <= new Date() ? '● Live immediately' : '◷ Scheduled'}
               </span>
             </div>
@@ -123,19 +123,19 @@ export default function ContestSchedule() {
         <button
           onClick={handleCreate}
           disabled={loading || !title || !startTime}
-          className="w-full bg-white hover:bg-gray-100 disabled:opacity-50 text-black font-semibold rounded-xl py-2.5 text-sm transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 text-white font-semibold rounded-[var(--radius-md)] py-2.5 text-sm transition-all duration-150 flex items-center justify-center gap-2"
         >
           {loading ? (
-            <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> Creating...</>
+            <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Creating...</>
           ) : (
             <><Trophy size={16} /> Schedule Contest</>
           )}
         </button>
       </div>
 
-      <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-        <p className="text-xs text-amber-400 font-medium mb-1">Admin Only Feature</p>
-        <p className="text-xs text-[#888888]">Only admin users can create contests. Problems are automatically selected from the problem bank — 1 easy, 2 medium, 1 hard.</p>
+      <div className="bg-[var(--warning-dim)] border border-[var(--warning-border)] rounded-[var(--radius-md)] p-3">
+        <p className="text-xs text-[var(--warning)] font-medium mb-1">Admin Only Feature</p>
+        <p className="text-xs text-[var(--text-secondary)]">Only admin users can create contests. Problems are automatically selected from the problem bank — 1 easy, 2 medium, 1 hard.</p>
       </div>
     </div>
   )

@@ -87,21 +87,9 @@ export default function Contest() {
     fetchData()
   }, [user])
 
-  const statusColor = (s: string) => ({
-    active: 'text-green-400 bg-green-400/10 border-green-400/20',
-    upcoming: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-    ended: 'text-[#555555] bg-[#1a1a1a] border-[#2a2a2a]',
-  }[s] || '')
-
-  const statusLabel = (s: string) => ({
-    active: '● Live',
-    upcoming: '◷ Upcoming',
-    ended: '✓ Ended',
-  }[s] || s)
-
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
@@ -110,17 +98,17 @@ export default function Contest() {
   const endedContests = contests.filter(c => c.status === 'ended')
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-white">Contest</h1>
-          <p className="text-[#666666] text-sm mt-1">Compete with peers in timed coding challenges</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Contest</h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">Compete with peers in timed coding challenges</p>
         </div>
         {isAdmin && (
           <button
             onClick={() => navigate('/contest/schedule')}
-            className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black font-semibold px-4 py-2 rounded-xl text-sm transition-colors"
+            className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium px-4 py-2 rounded-[var(--radius-md)] text-sm transition-all duration-150"
           >
             <Plus size={14} /> Schedule Contest
           </button>
@@ -132,25 +120,23 @@ export default function Contest() {
         <div
           key={c.id}
           onClick={() => navigate(`/contest/${c.id}`)}
-          className="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-2xl p-6 cursor-pointer hover:border-green-500/50 transition-colors"
+          className="bg-[var(--bg-surface)] border border-[var(--success-border)] rounded-[var(--radius-lg)] p-5 cursor-pointer hover:border-[var(--border-strong)] transition-colors duration-150"
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full border text-green-400 bg-green-400/10 border-green-400/20">
-                  ● Live Now
-                </span>
-                <span className="text-xs text-[#555555]">{c.problem_ids?.length || 0} problems · 90 min</span>
+                <span className="badge badge-active">● Live Now</span>
+                <span className="text-xs text-[var(--text-muted)]">{c.problem_ids?.length || 0} problems · 90 min</span>
               </div>
-              <h2 className="text-xl font-black text-white mb-1">{c.title}</h2>
-              <p className="text-sm text-[#888888] mb-4">{c.description}</p>
-              <div className="flex items-center gap-1.5 text-amber-400 text-sm">
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1">{c.title}</h2>
+              <p className="text-sm text-[var(--text-secondary)] mb-4">{c.description}</p>
+              <div className="flex items-center gap-1.5 text-[var(--warning)] text-sm">
                 <Clock size={14} />
-                <span className="font-mono font-bold"><CountdownTimer endTime={c.end_time} /></span>
-                <span className="text-[#555555] text-xs">remaining</span>
+                <span className="font-mono font-semibold"><CountdownTimer endTime={c.end_time} /></span>
+                <span className="text-[var(--text-muted)] text-xs">remaining</span>
               </div>
             </div>
-            <button className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-black font-bold px-5 py-2.5 rounded-xl text-sm transition-colors ml-6 flex-shrink-0">
+            <button className="btn btn-primary ml-6 flex-shrink-0">
               Enter Contest <ChevronRight size={16} />
             </button>
           </div>
@@ -160,24 +146,27 @@ export default function Contest() {
       {/* Upcoming contests */}
       {upcomingContests.length > 0 && (
         <div>
-          <h2 className="text-xs font-medium text-[#555555] uppercase tracking-widest mb-3">Upcoming</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">Upcoming</span>
+            <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+          </div>
           <div className="space-y-3">
             {upcomingContests.map(c => (
-              <div key={c.id} className="bg-[#0D0D0D] border border-blue-500/20 rounded-xl p-5 flex items-center justify-between">
+              <div key={c.id} className="bg-[var(--bg-surface)] border border-[var(--accent-border)] rounded-[var(--radius-md)] p-4 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full border text-blue-400 bg-blue-400/10 border-blue-400/20">◷ Upcoming</span>
+                    <span className="badge badge-upcoming">◷ Upcoming</span>
                   </div>
-                  <h3 className="font-bold text-white">{c.title}</h3>
-                  <div className="flex items-center gap-4 mt-1 text-xs text-[#555555]">
+                  <h3 className="font-semibold text-[var(--text-primary)] text-sm">{c.title}</h3>
+                  <div className="flex items-center gap-4 mt-1 text-xs text-[var(--text-muted)]">
                     <span>{c.problem_ids?.length || 0} problems</span>
                     <span>Starts: {new Date(c.start_time).toLocaleString()}</span>
-                    <span className="text-blue-400">
+                    <span className="text-[var(--info)]">
                       In <StartCountdown startTime={c.start_time} />
                     </span>
                   </div>
                 </div>
-                <Trophy size={20} className="text-[#333333]" />
+                <Trophy size={20} className="text-[var(--text-disabled)]" />
               </div>
             ))}
           </div>
@@ -187,24 +176,27 @@ export default function Contest() {
       {/* Past contests */}
       {endedContests.length > 0 && (
         <div>
-          <h2 className="text-xs font-medium text-[#555555] uppercase tracking-widest mb-3">Past Contests</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">Past Contests</span>
+            <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+          </div>
           <div className="space-y-2">
             {endedContests.map(c => (
               <div
                 key={c.id}
                 onClick={() => navigate(`/contest/${c.id}`)}
-                className="bg-[#0D0D0D] border border-[#1a1a1a] hover:border-[#333333] rounded-xl p-4 flex items-center justify-between cursor-pointer transition-colors group"
+                className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] rounded-[var(--radius-md)] p-4 flex items-center justify-between cursor-pointer transition-colors duration-150 group"
               >
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full border text-[#555555] bg-[#1a1a1a] border-[#2a2a2a]">✓ Ended</span>
+                    <span className="badge badge-ended">✓ Ended</span>
                   </div>
-                  <h3 className="font-medium text-[#888888]">{c.title}</h3>
-                  <div className="text-xs text-[#444444] mt-0.5">
+                  <h3 className="font-medium text-[var(--text-secondary)]">{c.title}</h3>
+                  <div className="text-xs text-[var(--text-muted)] mt-0.5">
                     {new Date(c.start_time).toLocaleDateString()} · {c.problem_ids?.length || 0} problems
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-[#333333] group-hover:text-white transition-colors" />
+                <ChevronRight size={16} className="text-[var(--text-disabled)] group-hover:text-[var(--text-primary)] transition-colors duration-150" />
               </div>
             ))}
           </div>
@@ -213,14 +205,14 @@ export default function Contest() {
 
       {/* Empty state */}
       {contests.length === 0 && (
-        <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-16 text-center">
-          <Trophy size={40} className="text-[#333333] mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No Contests Yet</h2>
-          <p className="text-[#555555] text-sm mb-6">Check back soon for upcoming contests</p>
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] py-12 text-center">
+          <Trophy size={32} className="text-[var(--text-disabled)] mx-auto mb-3" />
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No Contests Yet</h2>
+          <p className="text-[var(--text-muted)] text-sm mb-6">Check back soon for upcoming contests</p>
           {isAdmin && (
             <button
               onClick={() => navigate('/contest/schedule')}
-              className="bg-white text-black font-semibold px-6 py-2.5 rounded-xl text-sm hover:bg-gray-100 transition-colors"
+              className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium px-4 py-2 rounded-[var(--radius-md)] text-sm transition-all duration-150"
             >
               Schedule First Contest
             </button>

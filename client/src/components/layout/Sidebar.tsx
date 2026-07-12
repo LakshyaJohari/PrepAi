@@ -17,10 +17,10 @@ export default function Sidebar() {
           key={to}
           to={to}
           className={({ isActive }) =>
-            `flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+            `flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-md)] text-sm transition-colors duration-150 ${
               isActive
-                ? 'bg-white/10 text-white font-medium'
-                : 'text-[#888888] hover:text-white hover:bg-white/5'
+                ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)] font-medium'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
             }`
           }
         >

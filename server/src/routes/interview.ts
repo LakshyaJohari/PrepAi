@@ -50,7 +50,8 @@ router.post('/answer', async (req, res) => {
 
     res.json({ question: nextQuestion, history })
   } catch (err) {
-    res.status(500).json({ error: 'Failed to process answer' })
+    console.error('Interview answer error:', err)
+    res.status(500).json({ error: 'Failed to process answer', details: String(err) })
   }
 })
 
@@ -67,7 +68,8 @@ router.post('/score', async (req, res) => {
 
     res.json({ scores })
   } catch (err) {
-    res.status(500).json({ error: 'Failed to score interview' })
+    console.error('Interview score error:', err)
+    res.status(500).json({ error: 'Failed to score interview', details: String(err) })
   }
 })
 

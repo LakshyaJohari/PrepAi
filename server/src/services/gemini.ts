@@ -2,7 +2,11 @@ import Groq from 'groq-sdk'
 import dotenv from 'dotenv'
 dotenv.config()
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+  timeout: 20_000, // fail fast instead of hanging on the SDK's 1-minute default
+  maxRetries: 1,
+})
 
 const MODEL = 'llama-3.3-70b-versatile'
 

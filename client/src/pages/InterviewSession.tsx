@@ -90,14 +90,14 @@ export default function InterviewSession() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-black text-white">{company} — {role}</h1>
-          <p className="text-sm text-[#666666] capitalize mt-0.5">{roundType?.replace('_', ' ')} · {difficulty}</p>
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">{company} — {role}</h1>
+          <p className="text-sm text-[var(--text-secondary)] capitalize mt-0.5">{roundType?.replace('_', ' ')} · {difficulty}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-[#555555]">Q{questionIndex} of 6</span>
-          <div className="w-24 h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
+          <span className="text-sm text-[var(--text-muted)]">Q{questionIndex} of 6</span>
+          <div className="w-24 h-1 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all"
+              className="h-full bg-[var(--accent)] rounded-full transition-all duration-150"
               style={{ width: `${(questionIndex / 6) * 100}%` }}
             />
           </div>
@@ -108,57 +108,57 @@ export default function InterviewSession() {
       {turns.length > 0 && (
         <div className="space-y-3">
           {turns.map((turn, i) => (
-            <div key={i} className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-indigo-400 font-medium mb-1">Q{i + 1}</p>
-              <p className="text-sm text-[#888888] mb-2">{turn.question}</p>
-              <p className="text-xs text-[#555555] bg-[#1a1a1a] rounded-lg p-2">{turn.answer}</p>
+            <div key={i} className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] p-4">
+              <p className="text-xs text-[var(--accent)] font-medium mb-1">Q{i + 1}</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-2">{turn.question}</p>
+              <p className="text-xs text-[var(--text-muted)] bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-2">{turn.answer}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Current question */}
-      <div className="bg-[#0D0D0D] border border-white/20 rounded-xl p-5">
+      <div className="bg-[var(--bg-surface)] border border-[var(--accent-border)] rounded-[var(--radius-lg)] p-5">
         <div className="flex items-center gap-2 mb-3">
-          <span className="bg-white/10 text-white text-xs font-medium px-2 py-0.5 rounded-full">Current Question</span>
+          <span className="bg-[var(--accent-dim)] text-[var(--accent)] text-xs font-medium px-2 py-0.5 rounded-[var(--radius-full)]">Current Question</span>
         </div>
-        <p className="text-white font-medium leading-relaxed">{currentQuestion}</p>
+        <p className="text-[var(--text-primary)] font-medium leading-relaxed">{currentQuestion}</p>
       </div>
 
       {/* Answer input */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-xl p-4">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 focus-within:border-[var(--accent)] transition-colors duration-150">
         <textarea
           value={answer}
           onChange={e => setAnswer(e.target.value)}
           placeholder="Type your answer here or use the mic..."
-          className="w-full bg-transparent text-white text-sm resize-none focus:outline-none min-h-32 placeholder-[#444444]"
+          className="w-full bg-transparent text-[var(--text-primary)] text-sm resize-none focus:outline-none min-h-32 placeholder-[var(--text-muted)]"
         />
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#1a1a1a]">
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border-subtle)]">
           <div className="flex items-center gap-2">
             <button
               onClick={toggleVoice}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-md)] text-sm transition-colors duration-150 ${
                 isListening
-                  ? 'bg-red-400/20 text-red-400'
-                  : 'bg-[#1a1a1a] text-[#888888] hover:text-white'
+                  ? 'bg-[var(--danger-dim)] text-[var(--danger)]'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {isListening ? <MicOff size={14} /> : <Mic size={14} />}
               {isListening ? 'Stop' : 'Voice'}
             </button>
-            <span className="text-xs text-[#444444]">{answer.length} chars</span>
+            <span className="text-xs text-[var(--text-muted)]">{answer.length} chars</span>
           </div>
           <div className="flex gap-2">
             <button
               onClick={handleEnd}
-              className="px-3 py-1.5 text-sm text-[#555555] hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] rounded-[var(--radius-md)] transition-colors duration-150"
             >
               End Session
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading || !answer.trim()}
-              className="flex items-center gap-2 bg-white hover:bg-gray-100 disabled:opacity-50 text-black px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 text-white px-4 py-1.5 rounded-[var(--radius-md)] text-sm font-medium transition-all duration-150"
             >
               {loading ? 'Thinking...' : <><Send size={14} /> Submit</>}
             </button>

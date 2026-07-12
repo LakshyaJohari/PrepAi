@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import { useNavigate } from 'react-router-dom'
-import { Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 
 const topicOptions = ['Array', 'String', 'LinkedList', 'Tree', 'Graph', 'Dynamic Programming', 'Binary Search', 'Stack', 'Heap', 'Greedy', 'Backtracking', 'Two Pointers', 'Sliding Window', 'Trie', 'Bit Manipulation', 'Math', 'Sorting', 'Hashing']
 const companyOptions = ['Google', 'Meta', 'Amazon', 'Microsoft', 'Apple', 'Netflix', 'Adobe', 'Uber', 'Flipkart', 'Swiggy', 'Zomato', 'Atlassian', 'Salesforce', 'Oracle', 'Goldman Sachs']
@@ -23,9 +23,15 @@ function slugify(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4)
 }
 
-const inputClass = "w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors placeholder-[#444444]"
-const labelClass = "text-xs font-medium text-[#555555] uppercase tracking-widest block mb-1.5"
-const cardClass = "bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5"
+const inputClass = "w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
+const labelClass = "text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5"
+const cardClass = "bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5"
+
+const difficultyStyle: Record<string, string> = {
+  easy: 'bg-[var(--success-dim)] text-[var(--success)] border border-[var(--success-border)]',
+  medium: 'bg-[var(--warning-dim)] text-[var(--warning)] border border-[var(--warning-border)]',
+  hard: 'bg-[var(--danger-dim)] text-[var(--danger)] border border-[var(--danger-border)]',
+}
 
 export default function Contribute() {
   const { user } = useAuthStore()
@@ -109,14 +115,14 @@ export default function Contribute() {
   if (success) return (
     <div className="max-w-2xl mx-auto text-center py-20">
       <div className="text-6xl mb-6">🎉</div>
-      <h1 className="text-3xl font-black text-white mb-3">Problem Submitted!</h1>
-      <p className="text-[#666666] mb-2">Your problem has been submitted for review.</p>
-      <p className="text-[#444444] text-sm mb-8">Once approved by our team, it will appear in the problem bank for everyone to solve.</p>
+      <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">Problem Submitted!</h1>
+      <p className="text-[var(--text-secondary)] mb-2">Your problem has been submitted for review.</p>
+      <p className="text-[var(--text-muted)] text-sm mb-8">Once approved by our team, it will appear in the problem bank for everyone to solve.</p>
       <div className="flex gap-3 justify-center">
-        <button onClick={() => navigate('/problems')} className="bg-white text-black font-semibold px-6 py-2.5 rounded-xl text-sm hover:bg-gray-100 transition-colors">
+        <button onClick={() => navigate('/problems')} className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold px-4 py-2 rounded-[var(--radius-md)] text-sm transition-all duration-150">
           Browse Problems
         </button>
-        <button onClick={() => { setSuccess(false); setStep(1); setTitle(''); setDescription('') }} className="border border-[#222222] text-white px-6 py-2.5 rounded-xl text-sm hover:border-[#444444] transition-colors">
+        <button onClick={() => { setSuccess(false); setStep(1); setTitle(''); setDescription('') }} className="bg-[var(--bg-elevated)] hover:bg-[var(--border-default)] border border-[var(--border-default)] text-[var(--text-primary)] px-4 py-2 rounded-[var(--radius-md)] text-sm transition-all duration-150">
           Submit Another
         </button>
       </div>
@@ -126,10 +132,10 @@ export default function Contribute() {
   const steps = ['Basic Info', 'Examples', 'Test Cases', 'Hints & Review']
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-4">
       <div>
-        <h1 className="text-3xl font-black text-white">Contribute a Problem</h1>
-        <p className="text-[#666666] text-sm mt-1">Help grow the PrepAI problem bank. All submissions are reviewed before going live.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Contribute a Problem</h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">Help grow the PrepAI problem bank. All submissions are reviewed before going live.</p>
       </div>
 
       {/* Step indicator */}
@@ -137,21 +143,21 @@ export default function Contribute() {
         {steps.map((s, i) => (
           <div key={i} className="flex items-center gap-2 flex-1">
             <div className={`flex items-center gap-2 ${i + 1 <= step ? 'opacity-100' : 'opacity-30'}`}>
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${i + 1 < step ? 'bg-green-500 text-black' : i + 1 === step ? 'bg-white text-black' : 'bg-[#1a1a1a] text-[#555555]'}`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors duration-150 ${i + 1 < step ? 'bg-[var(--success)] text-white' : i + 1 === step ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-subtle)]'}`}>
                 {i + 1 < step ? '✓' : i + 1}
               </div>
-              <span className={`text-xs font-medium hidden sm:block ${i + 1 === step ? 'text-white' : 'text-[#555555]'}`}>{s}</span>
+              <span className={`text-xs font-medium hidden sm:block ${i + 1 === step ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>{s}</span>
             </div>
-            {i < steps.length - 1 && <div className={`flex-1 h-px mx-2 ${i + 1 < step ? 'bg-green-500/50' : 'bg-[#1a1a1a]'}`} />}
+            {i < steps.length - 1 && <div className={`flex-1 h-px mx-2 ${i + 1 < step ? 'bg-[var(--success)]' : 'bg-[var(--border-subtle)]'}`} />}
           </div>
         ))}
       </div>
 
       {/* Step 1 — Basic Info */}
       {step === 1 && (
-        <div className="space-y-5">
+        <div className="space-y-4">
           <div className={cardClass}>
-            <h2 className="font-bold text-white mb-4">Problem Details</h2>
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Problem Details</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Problem Title *</label>
@@ -163,12 +169,10 @@ export default function Contribute() {
                 <div className="flex gap-3">
                   {difficulties.map(d => (
                     <button key={d} onClick={() => setDifficulty(d)}
-                      className={`flex-1 py-2.5 rounded-xl text-sm font-medium capitalize transition-colors ${
+                      className={`flex-1 py-2.5 rounded-[var(--radius-md)] text-sm font-medium capitalize transition-colors duration-150 ${
                         difficulty === d
-                          ? d === 'easy' ? 'bg-green-400/20 text-green-400 border border-green-400/30'
-                          : d === 'medium' ? 'bg-amber-400/20 text-amber-400 border border-amber-400/30'
-                          : 'bg-red-400/20 text-red-400 border border-red-400/30'
-                          : 'bg-[#1a1a1a] text-[#555555] border border-transparent'
+                          ? difficultyStyle[d]
+                          : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
                       }`}
                     >{d}</button>
                   ))}
@@ -198,23 +202,23 @@ export default function Contribute() {
           </div>
 
           <div className={cardClass}>
-            <h2 className="font-bold text-white mb-4">Topics *</h2>
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Topics *</h2>
             <div className="flex flex-wrap gap-2">
               {topicOptions.map(t => (
                 <button key={t} onClick={() => toggleTopic(t)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${selectedTopics.includes(t) ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-[#1a1a1a] text-[#666666] hover:text-white'}`}
+                  className={`px-3 py-1.5 rounded-[var(--radius-md)] text-xs transition-colors duration-150 ${selectedTopics.includes(t) ? 'bg-[var(--accent-dim)] text-[var(--accent)] border border-[var(--accent-border)]' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >{t}</button>
               ))}
             </div>
-            {selectedTopics.length > 0 && <p className="text-xs text-[#444444] mt-2">Selected: {selectedTopics.join(', ')}</p>}
+            {selectedTopics.length > 0 && <p className="text-xs text-[var(--text-muted)] mt-2">Selected: {selectedTopics.join(', ')}</p>}
           </div>
 
           <div className={cardClass}>
-            <h2 className="font-bold text-white mb-4">Companies *</h2>
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Companies *</h2>
             <div className="flex flex-wrap gap-2">
               {companyOptions.map(c => (
                 <button key={c} onClick={() => toggleCompany(c)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${selectedCompanies.includes(c) ? 'bg-white text-black font-medium' : 'bg-[#1a1a1a] text-[#666666] hover:text-white'}`}
+                  className={`px-3 py-1.5 rounded-[var(--radius-md)] text-xs transition-colors duration-150 ${selectedCompanies.includes(c) ? 'bg-[var(--accent)] text-white font-medium' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >{c}</button>
               ))}
             </div>
@@ -225,13 +229,13 @@ export default function Contribute() {
       {/* Step 2 — Examples */}
       {step === 2 && (
         <div className="space-y-4">
-          <p className="text-sm text-[#666666]">Add 2-3 examples that illustrate the problem. These are shown to users while solving.</p>
+          <p className="text-sm text-[var(--text-secondary)]">Add 2-3 examples that illustrate the problem. These are shown to users while solving.</p>
           {examples.map((ex, i) => (
             <div key={i} className={cardClass}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white">Example {i + 1}</h3>
+                <h3 className="font-semibold text-[var(--text-primary)]">Example {i + 1}</h3>
                 {examples.length > 1 && (
-                  <button onClick={() => removeExample(i)} className="text-[#444444] hover:text-red-400 transition-colors"><X size={16} /></button>
+                  <button onClick={() => removeExample(i)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors duration-150"><X size={16} /></button>
                 )}
               </div>
               <div className="space-y-3">
@@ -250,7 +254,7 @@ export default function Contribute() {
               </div>
             </div>
           ))}
-          <button onClick={addExample} className="w-full border border-dashed border-[#2a2a2a] hover:border-[#444444] text-[#555555] hover:text-white rounded-xl py-3 text-sm transition-colors flex items-center justify-center gap-2">
+          <button onClick={addExample} className="w-full border border-dashed border-[var(--border-default)] hover:border-[var(--accent)] text-[var(--text-muted)] hover:text-[var(--accent)] rounded-[var(--radius-lg)] py-3 text-sm transition-colors duration-150 flex items-center justify-center gap-2">
             <Plus size={14} /> Add Example
           </button>
         </div>
@@ -259,18 +263,18 @@ export default function Contribute() {
       {/* Step 3 — Test Cases */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
-            <p className="text-xs text-amber-400">⚠️ Test cases are used to judge submissions. Make sure inputs and outputs are exact and unambiguous. Add at least 3 test cases including edge cases.</p>
+          <div className="bg-[var(--warning-dim)] border border-[var(--warning-border)] rounded-[var(--radius-md)] p-3">
+            <p className="text-xs text-[var(--warning)]">⚠️ Test cases are used to judge submissions. Make sure inputs and outputs are exact and unambiguous. Add at least 3 test cases including edge cases.</p>
           </div>
           {testCases.map((tc, i) => (
             <div key={i} className={cardClass}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-white text-sm">
+                <h3 className="font-semibold text-[var(--text-primary)] text-sm">
                   Test Case {i + 1}
-                  {i >= 2 && <span className="ml-2 text-xs text-indigo-400 bg-indigo-400/10 px-2 py-0.5 rounded-full">Hidden</span>}
+                  {i >= 2 && <span className="ml-2 text-xs text-[var(--accent)] bg-[var(--accent-dim)] px-2 py-0.5 rounded-[var(--radius-full)]">Hidden</span>}
                 </h3>
                 {testCases.length > 2 && (
-                  <button onClick={() => removeTestCase(i)} className="text-[#444444] hover:text-red-400 transition-colors"><X size={16} /></button>
+                  <button onClick={() => removeTestCase(i)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors duration-150"><X size={16} /></button>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -285,7 +289,7 @@ export default function Contribute() {
               </div>
             </div>
           ))}
-          <button onClick={addTestCase} className="w-full border border-dashed border-[#2a2a2a] hover:border-[#444444] text-[#555555] hover:text-white rounded-xl py-3 text-sm transition-colors flex items-center justify-center gap-2">
+          <button onClick={addTestCase} className="w-full border border-dashed border-[var(--border-default)] hover:border-[var(--accent)] text-[var(--text-muted)] hover:text-[var(--accent)] rounded-[var(--radius-lg)] py-3 text-sm transition-colors duration-150 flex items-center justify-center gap-2">
             <Plus size={14} /> Add Test Case
           </button>
         </div>
@@ -293,10 +297,10 @@ export default function Contribute() {
 
       {/* Step 4 — Hints & Review */}
       {step === 4 && (
-        <div className="space-y-5">
+        <div className="space-y-4">
           <div className={cardClass}>
-            <h2 className="font-bold text-white mb-4">Hints (Optional)</h2>
-            <p className="text-xs text-[#555555] mb-4">Add hints that users can reveal one by one when stuck.</p>
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Hints (Optional)</h2>
+            <p className="text-xs text-[var(--text-muted)] mb-4">Add hints that users can reveal one by one when stuck.</p>
             <div className="space-y-3">
               {hints.map((h, i) => (
                 <div key={i} className="flex gap-2">
@@ -307,11 +311,11 @@ export default function Contribute() {
                     placeholder={`Hint ${i + 1} — e.g. Think about using a hash map`}
                   />
                   {hints.length > 1 && (
-                    <button onClick={() => removeHint(i)} className="text-[#444444] hover:text-red-400 flex-shrink-0"><X size={16} /></button>
+                    <button onClick={() => removeHint(i)} className="text-[var(--text-muted)] hover:text-[var(--danger)] flex-shrink-0"><X size={16} /></button>
                   )}
                 </div>
               ))}
-              <button onClick={addHint} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+              <button onClick={addHint} className="flex items-center gap-2 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors duration-150">
                 <Plus size={12} /> Add hint
               </button>
             </div>
@@ -319,41 +323,41 @@ export default function Contribute() {
 
           {/* Review summary */}
           <div className={cardClass}>
-            <h2 className="font-bold text-white mb-4">Review Summary</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Title</span>
-                <span className="text-xs text-white font-medium">{title}</span>
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Review Summary</h2>
+            <div className="space-y-0">
+              <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
+                <span className="text-xs text-[var(--text-muted)]">Title</span>
+                <span className="text-xs text-[var(--text-primary)] font-medium">{title}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Difficulty</span>
-                <span className={`text-xs font-bold capitalize ${difficulty === 'easy' ? 'text-green-400' : difficulty === 'medium' ? 'text-amber-400' : 'text-red-400'}`}>{difficulty}</span>
+              <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
+                <span className="text-xs text-[var(--text-muted)]">Difficulty</span>
+                <span className={`text-xs font-semibold capitalize ${difficulty === 'easy' ? 'text-[var(--success)]' : difficulty === 'medium' ? 'text-[var(--warning)]' : 'text-[var(--danger)]'}`}>{difficulty}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Topics</span>
-                <span className="text-xs text-white">{selectedTopics.join(', ')}</span>
+              <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
+                <span className="text-xs text-[var(--text-muted)]">Topics</span>
+                <span className="text-xs text-[var(--text-primary)]">{selectedTopics.join(', ')}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Companies</span>
-                <span className="text-xs text-white">{selectedCompanies.join(', ')}</span>
+              <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
+                <span className="text-xs text-[var(--text-muted)]">Companies</span>
+                <span className="text-xs text-[var(--text-primary)]">{selectedCompanies.join(', ')}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Examples</span>
-                <span className="text-xs text-white">{examples.filter(e => e.input).length}</span>
+              <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
+                <span className="text-xs text-[var(--text-muted)]">Examples</span>
+                <span className="text-xs text-[var(--text-primary)]">{examples.filter(e => e.input).length}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Test Cases</span>
-                <span className="text-xs text-white">{testCases.filter(tc => tc.input).length}</span>
+              <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
+                <span className="text-xs text-[var(--text-muted)]">Test Cases</span>
+                <span className="text-xs text-[var(--text-primary)]">{testCases.filter(tc => tc.input).length}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-[#555555]">Hints</span>
-                <span className="text-xs text-white">{hints.filter(h => h).length}</span>
+              <div className="flex justify-between py-2">
+                <span className="text-xs text-[var(--text-muted)]">Hints</span>
+                <span className="text-xs text-[var(--text-primary)]">{hints.filter(h => h).length}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-xl p-4">
-            <p className="text-xs text-[#555555]">By submitting, you confirm this is your original problem or you have rights to share it. Your problem will be reviewed before going live on PrepAI.</p>
+          <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] p-4">
+            <p className="text-xs text-[var(--text-muted)]">By submitting, you confirm this is your original problem or you have rights to share it. Your problem will be reviewed before going live on PrepAI.</p>
           </div>
         </div>
       )}
@@ -363,7 +367,7 @@ export default function Contribute() {
         <button
           onClick={() => setStep(s => s - 1)}
           disabled={step === 1}
-          className="px-5 py-2.5 rounded-xl text-sm text-[#666666] border border-[#1a1a1a] hover:border-[#333333] hover:text-white disabled:opacity-30 transition-colors"
+          className="px-4 py-2 rounded-[var(--radius-md)] text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] hover:bg-[var(--border-default)] border border-[var(--border-default)] hover:text-[var(--text-primary)] disabled:opacity-30 transition-all duration-150"
         >
           ← Back
         </button>
@@ -371,7 +375,7 @@ export default function Contribute() {
           <button
             onClick={() => setStep(s => s + 1)}
             disabled={!validateStep(step)}
-            className="px-5 py-2.5 rounded-xl text-sm bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-30 transition-colors"
+            className="px-4 py-2 rounded-[var(--radius-md)] text-sm bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold disabled:opacity-30 transition-all duration-150"
           >
             Next →
           </button>
@@ -379,9 +383,9 @@ export default function Contribute() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="px-5 py-2.5 rounded-xl text-sm bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 transition-colors flex items-center gap-2"
+            className="px-4 py-2 rounded-[var(--radius-md)] text-sm bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold disabled:opacity-50 transition-all duration-150 flex items-center gap-2"
           >
-            {submitting ? <><div className="w-3 h-3 border border-black border-t-transparent rounded-full animate-spin" /> Submitting...</> : '🚀 Submit Problem'}
+            {submitting ? <><div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" /> Submitting...</> : '🚀 Submit Problem'}
           </button>
         )}
       </div>

@@ -74,11 +74,11 @@ function ActivityHeatmap({ sessions }: { sessions: Session[] }) {
       months.push({ label: month, col: wi });
   });
 
-  const cellColor = (count: number) => {
-    if (count === 0) return "#1a1a1a";
-    if (count === 1) return "#312e81";
-    if (count === 2) return "#4338ca";
-    return "#6366f1";
+  const cellClass = (count: number) => {
+    if (count === 0) return "heatmap-empty";
+    if (count === 1) return "heatmap-l1";
+    if (count === 2) return "heatmap-l2";
+    return "heatmap-l3";
   };
 
   return (
@@ -90,7 +90,7 @@ function ActivityHeatmap({ sessions }: { sessions: Session[] }) {
             return (
               <div key={wi} className="w-3 text-center">
                 {m && (
-                  <span className="text-[9px] text-[#444444]">{m.label}</span>
+                  <span className="text-[9px] text-[var(--text-muted)]">{m.label}</span>
                 )}
               </div>
             );
@@ -103,23 +103,18 @@ function ActivityHeatmap({ sessions }: { sessions: Session[] }) {
                 <div
                   key={di}
                   title={`${day.date}: ${day.count} sessions`}
-                  className="w-3 h-3 rounded-sm cursor-pointer hover:scale-125 transition-transform"
-                  style={{ background: cellColor(day.count) }}
+                  className={`w-3 h-3 rounded-sm cursor-pointer hover:scale-125 transition-transform duration-150 ${cellClass(day.count)}`}
                 />
               ))}
             </div>
           ))}
         </div>
         <div className="flex items-center gap-1.5 mt-2 justify-end">
-          <span className="text-[10px] text-[#444444]">Less</span>
-          {["#1a1a1a", "#312e81", "#4338ca", "#6366f1"].map((c, i) => (
-            <div
-              key={i}
-              className="w-3 h-3 rounded-sm"
-              style={{ background: c }}
-            />
+          <span className="text-[10px] text-[var(--text-muted)]">Less</span>
+          {["heatmap-empty", "heatmap-l1", "heatmap-l2", "heatmap-l3"].map((c, i) => (
+            <div key={i} className={`w-3 h-3 rounded-sm ${c}`} />
           ))}
-          <span className="text-[10px] text-[#444444]">More</span>
+          <span className="text-[10px] text-[var(--text-muted)]">More</span>
         </div>
       </div>
     </div>
@@ -161,22 +156,22 @@ function AnalyticsSection({ userId }: { userId: string }) {
   if (!loaded)
     return (
       <div className="flex items-center justify-center h-32">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
   return (
     <div className="space-y-4">
-      <div className="flex bg-[#0D0D0D] border border-[#1a1a1a] rounded-xl p-1 w-fit">
+      <div className="flex bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] p-1 w-fit">
         <button
           onClick={() => setAnalyticsTab("problems")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${analyticsTab === "problems" ? "bg-white text-black font-medium" : "text-[#666666] hover:text-white"}`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-sm)] text-sm transition-colors duration-150 ${analyticsTab === "problems" ? "bg-[var(--accent)] text-white font-medium" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
         >
           📊 Problem Analytics
         </button>
         <button
           onClick={() => setAnalyticsTab("interviews")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${analyticsTab === "interviews" ? "bg-white text-black font-medium" : "text-[#666666] hover:text-white"}`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-sm)] text-sm transition-colors duration-150 ${analyticsTab === "interviews" ? "bg-[var(--accent)] text-white font-medium" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
         >
           🎤 Interview Analytics
         </button>
@@ -263,20 +258,20 @@ export default function Profile() {
   ].length;
 
   const scoreColor = (s: number | null) => {
-    if (!s) return "text-[#444444]";
+    if (!s) return "text-[var(--text-disabled)]";
     return s >= 80
-      ? "text-green-400"
+      ? "text-[var(--success)]"
       : s >= 60
-        ? "text-amber-400"
-        : "text-red-400";
+        ? "text-[var(--warning)]"
+        : "text-[var(--danger)]";
   };
 
   const diffColor = (d: string) =>
     ({
-      easy: "text-green-400",
-      medium: "text-amber-400",
-      hard: "text-red-400",
-    })[d?.toLowerCase()] || "text-[#555555]";
+      easy: "text-[var(--success)]",
+      medium: "text-[var(--warning)]",
+      hard: "text-[var(--danger)]",
+    })[d?.toLowerCase()] || "text-[var(--text-muted)]";
 
   const roundBreakdown = sessions.reduce(
     (acc, s) => {
@@ -298,7 +293,7 @@ export default function Profile() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
@@ -306,9 +301,9 @@ export default function Profile() {
     <div className="flex gap-6">
       {/* Left sidebar */}
       <div className="w-64 flex-shrink-0">
-        <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-4 sticky top-20">
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 sticky top-20">
           <div className="flex items-center gap-3 p-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-black text-lg">
+            <div className="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-semibold text-lg">
               {(profile?.username || user?.email || "?")
                 .charAt(0)
                 .toUpperCase()}
@@ -319,52 +314,52 @@ export default function Profile() {
                   <input
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
-                    className="bg-[#1a1a1a] border border-[#333] rounded-lg px-2 py-1 text-white text-xs focus:outline-none w-24"
+                    className="bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-sm)] px-2 py-1 text-[var(--text-primary)] text-xs focus:outline-none w-24"
                     autoFocus
                   />
                   <button
                     onClick={handleSaveUsername}
-                    className="text-green-400"
+                    className="text-[var(--success)]"
                   >
                     <Check size={12} />
                   </button>
                   <button
                     onClick={() => setEditing(false)}
-                    className="text-red-400"
+                    className="text-[var(--danger)]"
                   >
                     <X size={12} />
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
-                  <span className="font-bold text-white text-sm">
+                  <span className="font-semibold text-[var(--text-primary)] text-sm">
                     {profile?.username || user?.email?.split("@")[0]}
                   </span>
                   <button
                     onClick={() => setEditing(true)}
-                    className="text-[#444444] hover:text-white"
+                    className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   >
                     <Edit2 size={11} />
                   </button>
                 </div>
               )}
-              <div className="text-xs text-[#555555] truncate max-w-32">
+              <div className="text-xs text-[var(--text-muted)] truncate max-w-32">
                 {user?.email}
               </div>
             </div>
           </div>
 
-          <div className="h-px bg-[#1a1a1a] mb-2" />
+          <div className="h-px bg-[var(--border-subtle)] mb-2" />
 
           <div className="space-y-0.5">
             {sideLinks.map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] text-sm transition-colors duration-150 text-left ${
                   activeTab === id
-                    ? "bg-white/10 text-white font-medium"
-                    : "text-[#666666] hover:text-white hover:bg-white/5"
+                    ? "bg-[var(--bg-elevated)] text-[var(--text-primary)] font-medium"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
                 }`}
               >
                 <Icon size={16} />
@@ -373,11 +368,11 @@ export default function Profile() {
             ))}
           </div>
 
-          <div className="h-px bg-[#1a1a1a] my-2" />
+          <div className="h-px bg-[var(--border-subtle)] my-2" />
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[#666666] hover:text-red-400 hover:bg-red-400/5 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] text-sm text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger-dim)] transition-colors duration-150"
           >
             <LogOut size={16} /> Sign out
           </button>
@@ -389,37 +384,37 @@ export default function Profile() {
         {/* Activity tab */}
         {activeTab === "activity" && (
           <>
-            <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-6">
+            <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-bold text-white flex items-center gap-2">
+                <h2 className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                   🔥 Activity
                 </h2>
-                <span className="text-xs text-[#444444]">Last 6 months</span>
+                <span className="text-xs text-[var(--text-muted)]">Last 6 months</span>
               </div>
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center border-r border-[#1a1a1a]">
+                <div className="text-center border-r border-[var(--border-subtle)]">
                   <div
-                    className={`text-3xl font-black mb-1 ${streakActive ? "text-blue-400" : "text-white"}`}
+                    className={`text-3xl font-bold mb-1 ${streakActive ? "text-[var(--info)]" : "text-[var(--text-primary)]"}`}
                   >
                     {profile?.streak || 0}
                   </div>
-                  <div className="text-xs text-[#555555] uppercase tracking-widest">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">
                     Current Streak
                   </div>
                 </div>
-                <div className="text-center border-r border-[#1a1a1a]">
-                  <div className="text-3xl font-black text-indigo-400 mb-1">
+                <div className="text-center border-r border-[var(--border-subtle)]">
+                  <div className="text-3xl font-bold text-[var(--teal)] mb-1">
                     {profile?.best_streak || 0}
                   </div>
-                  <div className="text-xs text-[#555555] uppercase tracking-widest">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">
                     Best Streak
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-black text-indigo-400 mb-1">
+                  <div className="text-3xl font-bold text-[var(--accent)] mb-1">
                     {activeDays}
                   </div>
-                  <div className="text-xs text-[#555555] uppercase tracking-widest">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">
                     Active Days
                   </div>
                 </div>
@@ -428,52 +423,52 @@ export default function Profile() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-                <h3 className="font-bold text-white mb-4">By Round Type</h3>
+              <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+                <h3 className="font-semibold text-[var(--text-primary)] mb-4">By Round Type</h3>
                 <div className="space-y-3">
                   {Object.entries(roundBreakdown).map(([type, count]) => (
                     <div key={type}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-[#888888] capitalize">
+                        <span className="text-[var(--text-secondary)] capitalize">
                           {type.replace("_", " ")}
                         </span>
-                        <span className="text-white">{count}</span>
+                        <span className="text-[var(--text-primary)]">{count as number}</span>
                       </div>
-                      <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-indigo-500 rounded-full"
+                          className="h-full bg-[var(--accent)] rounded-full"
                           style={{
-                            width: `${(count / sessions.length) * 100}%`,
+                            width: `${((count as number) / sessions.length) * 100}%`,
                           }}
                         />
                       </div>
                     </div>
                   ))}
                   {sessions.length === 0 && (
-                    <p className="text-[#444444] text-xs">No sessions yet</p>
+                    <p className="text-[var(--text-muted)] text-xs">No sessions yet</p>
                   )}
                 </div>
               </div>
 
-              <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-                <h3 className="font-bold text-white mb-4">Performance</h3>
+              <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+                <h3 className="font-semibold text-[var(--text-primary)] mb-4">Performance</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#555555]">
+                    <span className="text-xs text-[var(--text-muted)]">
                       Total Sessions
                     </span>
-                    <span className="text-white font-bold">
+                    <span className="text-[var(--text-primary)] font-bold">
                       {sessions.length}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#555555]">Avg Score</span>
+                    <span className="text-xs text-[var(--text-muted)]">Avg Score</span>
                     <span className={`font-bold ${scoreColor(avgScore)}`}>
                       {avgScore || "—"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#555555]">Best Score</span>
+                    <span className="text-xs text-[var(--text-muted)]">Best Score</span>
                     <span
                       className={`font-bold ${scoreColor(Math.max(...sessions.map((s) => s.overall_score || 0)))}`}
                     >
@@ -485,10 +480,10 @@ export default function Profile() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#555555]">
+                    <span className="text-xs text-[var(--text-muted)]">
                       Problems Solved
                     </span>
-                    <span className="text-teal-400 font-bold">
+                    <span className="text-[var(--teal)] font-bold">
                       {problems.length}
                     </span>
                   </div>
@@ -496,12 +491,12 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
+            <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white">Recent Sessions</h3>
+                <h3 className="font-semibold text-[var(--text-primary)]">Recent Sessions</h3>
                 <button
                   onClick={() => setActiveTab("history")}
-                  className="text-xs text-indigo-400 hover:text-indigo-300"
+                  className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]"
                 >
                   View all →
                 </button>
@@ -509,25 +504,25 @@ export default function Profile() {
               {sessions.slice(0, 5).map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between py-3 border-b border-[#1a1a1a] last:border-0"
+                  className="flex items-center justify-between py-3 border-b border-[var(--border-subtle)] last:border-0"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-xs text-[#444444] w-20">
+                    <span className="text-xs text-[var(--text-muted)] w-20">
                       {s.company}
                     </span>
-                    <span className="text-sm text-white">{s.role}</span>
+                    <span className="text-sm text-[var(--text-primary)]">{s.role}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span
-                      className={`text-xs font-bold uppercase ${diffColor(s.difficulty)}`}
+                      className={`text-xs font-semibold uppercase ${diffColor(s.difficulty)}`}
                     >
                       {s.difficulty}
                     </span>
-                    <span className="text-xs text-[#444444]">
+                    <span className="text-xs text-[var(--text-muted)]">
                       {new Date(s.created_at).toLocaleDateString()}
                     </span>
                     <span
-                      className={`text-sm font-black ${scoreColor(s.overall_score)}`}
+                      className={`text-sm font-bold ${scoreColor(s.overall_score)}`}
                     >
                       {s.overall_score ?? "—"}
                     </span>
@@ -535,7 +530,7 @@ export default function Profile() {
                 </div>
               ))}
               {sessions.length === 0 && (
-                <p className="text-[#444444] text-sm text-center py-4">
+                <p className="text-[var(--text-muted)] text-sm text-center py-4">
                   No sessions yet
                 </p>
               )}
@@ -546,34 +541,34 @@ export default function Profile() {
         {/* History tab */}
         {activeTab === "history" && (
           <div className="space-y-4">
-            <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-              <h2 className="font-bold text-white mb-4">Interview Sessions</h2>
+            <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+              <h2 className="font-semibold text-[var(--text-primary)] mb-4">Interview Sessions</h2>
               <div className="space-y-2">
                 {sessions.map((s) => (
                   <div
                     key={s.id}
-                    className="flex items-center justify-between py-3 border-b border-[#1a1a1a] last:border-0"
+                    className="flex items-center justify-between py-3 border-b border-[var(--border-subtle)] last:border-0"
                   >
                     <div className="flex items-center gap-4">
-                      <span className="text-xs text-[#444444] w-20">
+                      <span className="text-xs text-[var(--text-muted)] w-20">
                         {s.company}
                       </span>
-                      <span className="text-sm text-white">{s.role}</span>
-                      <span className="text-xs text-[#444444] capitalize">
+                      <span className="text-sm text-[var(--text-primary)]">{s.role}</span>
+                      <span className="text-xs text-[var(--text-muted)] capitalize">
                         {s.round_type?.replace("_", " ")}
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
                       <span
-                        className={`text-xs font-bold uppercase ${diffColor(s.difficulty)}`}
+                        className={`text-xs font-semibold uppercase ${diffColor(s.difficulty)}`}
                       >
                         {s.difficulty}
                       </span>
-                      <span className="text-xs text-[#444444]">
+                      <span className="text-xs text-[var(--text-muted)]">
                         {new Date(s.created_at).toLocaleDateString()}
                       </span>
                       <span
-                        className={`text-sm font-black ${scoreColor(s.overall_score)}`}
+                        className={`text-sm font-bold ${scoreColor(s.overall_score)}`}
                       >
                         {s.overall_score ?? "—"}
                       </span>
@@ -581,43 +576,43 @@ export default function Profile() {
                   </div>
                 ))}
                 {sessions.length === 0 && (
-                  <p className="text-[#444444] text-sm text-center py-8">
+                  <p className="text-[var(--text-muted)] text-sm text-center py-8">
                     No sessions yet
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-              <h2 className="font-bold text-white mb-4">Problems Solved</h2>
+            <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+              <h2 className="font-semibold text-[var(--text-primary)] mb-4">Problems Solved</h2>
               <div className="space-y-2">
                 {problems.map((p) => (
                   <div
                     key={p.id}
                     onClick={() => setSelectedProblem(p)}
-                    className="flex items-center justify-between py-3 border-b border-[#1a1a1a] last:border-0 cursor-pointer hover:bg-white/[0.02] transition-colors"
+                    className="flex items-center justify-between py-3 border-b border-[var(--border-subtle)] last:border-0 cursor-pointer hover:bg-[var(--bg-elevated)] transition-colors duration-150"
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-2 h-2 rounded-full ${p.difficulty === "easy" ? "bg-green-400" : p.difficulty === "medium" ? "bg-amber-400" : "bg-red-400"}`}
+                        className={`w-2 h-2 rounded-full ${p.difficulty === "easy" ? "bg-[var(--success)]" : p.difficulty === "medium" ? "bg-[var(--warning)]" : "bg-[var(--danger)]"}`}
                       />
-                      <span className="text-sm text-white">{p.title}</span>
-                      <span className="text-xs text-[#444444]">{p.topic}</span>
+                      <span className="text-sm text-[var(--text-primary)]">{p.title}</span>
+                      <span className="text-xs text-[var(--text-muted)]">{p.topic}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-xs font-bold uppercase ${diffColor(p.difficulty)}`}
+                        className={`text-xs font-semibold uppercase ${diffColor(p.difficulty)}`}
                       >
                         {p.difficulty}
                       </span>
-                      <span className="text-xs text-[#444444]">
+                      <span className="text-xs text-[var(--text-muted)]">
                         {new Date(p.solved_at).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                 ))}
                 {problems.length === 0 && (
-                  <p className="text-[#444444] text-sm text-center py-8">
+                  <p className="text-[var(--text-muted)] text-sm text-center py-8">
                     No problems logged yet
                   </p>
                 )}
@@ -628,9 +623,9 @@ export default function Profile() {
 
         {/* Saved tab */}
         {activeTab === "saved" && (
-          <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-            <h2 className="font-bold text-white mb-4">Saved Questions</h2>
-            <p className="text-[#444444] text-sm text-center py-8">
+          <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Saved Questions</h2>
+            <p className="text-[var(--text-muted)] text-sm text-center py-8">
               Coming soon
             </p>
           </div>
@@ -643,11 +638,11 @@ export default function Profile() {
 
         {/* Settings tab */}
         {activeTab === "settings" && (
-          <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-            <h2 className="font-bold text-white mb-4">Account Settings</h2>
+          <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Account Settings</h2>
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-[#555555] uppercase tracking-widest block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
                   Display Name
                 </label>
                 <div className="flex gap-2">
@@ -656,7 +651,7 @@ export default function Profile() {
                       profile?.username || user?.email?.split("@")[0]
                     }
                     id="username-input"
-                    className="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white"
+                    className="flex-1 bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150"
                     placeholder="Your display name"
                   />
                   <button
@@ -680,30 +675,30 @@ export default function Profile() {
                       }
                       alert("Username updated!");
                     }}
-                    className="bg-white hover:bg-gray-100 text-black font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors"
+                    className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold px-4 py-2.5 rounded-[var(--radius-md)] text-sm transition-all duration-150"
                   >
                     Save
                   </button>
                 </div>
               </div>
               <div>
-                <label className="text-xs text-[#555555] uppercase tracking-widest block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
                   Email
                 </label>
                 <input
                   value={user?.email || ""}
                   disabled
-                  className="w-full bg-[#111111] border border-[#1a1a1a] rounded-xl px-4 py-2.5 text-[#555555] text-sm cursor-not-allowed"
+                  className="w-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-muted)] text-sm cursor-not-allowed"
                 />
-                <p className="text-xs text-[#444444] mt-1">
+                <p className="text-xs text-[var(--text-muted)] mt-1">
                   Email cannot be changed
                 </p>
               </div>
               <div>
-                <label className="text-xs text-[#555555] uppercase tracking-widest block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
                   Member Since
                 </label>
-                <p className="text-sm text-white">
+                <p className="text-sm text-[var(--text-primary)]">
                   {profile?.created_at
                     ? new Date(profile.created_at).toLocaleDateString("en-US", {
                         month: "long",
@@ -721,43 +716,43 @@ export default function Profile() {
       {/* Problem detail modal */}
       {selectedProblem && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4"
           onClick={() => setSelectedProblem(null)}
         >
           <div
-            className="bg-[#0D0D0D] border border-[#222222] rounded-2xl p-6 w-full max-w-lg"
+            className="bg-[var(--bg-overlay)] border border-[var(--border-default)] rounded-[var(--radius-xl)] p-6 w-full max-w-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-xl font-black text-white">
+                <h2 className="text-xl font-bold text-[var(--text-primary)]">
                   {selectedProblem.title}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <span
-                    className={`text-xs font-bold capitalize ${diffColor(selectedProblem.difficulty)}`}
+                    className={`text-xs font-semibold capitalize ${diffColor(selectedProblem.difficulty)}`}
                   >
                     {selectedProblem.difficulty}
                   </span>
-                  <span className="text-xs text-[#444444]">
+                  <span className="text-xs text-[var(--text-muted)]">
                     {selectedProblem.platform}
                   </span>
-                  <span className="text-xs text-[#444444]">
+                  <span className="text-xs text-[var(--text-muted)]">
                     {selectedProblem.topic}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedProblem(null)}
-                className="text-[#555555] hover:text-white text-xl"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xl"
               >
                 ×
               </button>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between bg-[#1a1a1a] rounded-xl p-3">
-                <span className="text-xs text-[#555555]">Solved on</span>
-                <span className="text-xs text-white">
+              <div className="flex justify-between bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3">
+                <span className="text-xs text-[var(--text-muted)]">Solved on</span>
+                <span className="text-xs text-[var(--text-primary)]">
                   {new Date(selectedProblem.solved_at).toLocaleDateString(
                     "en-US",
                     {
@@ -770,17 +765,17 @@ export default function Profile() {
                 </span>
               </div>
               {selectedProblem.time_taken && (
-                <div className="flex justify-between bg-[#1a1a1a] rounded-xl p-3">
-                  <span className="text-xs text-[#555555]">Time taken</span>
-                  <span className="text-xs text-white">
+                <div className="flex justify-between bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3">
+                  <span className="text-xs text-[var(--text-muted)]">Time taken</span>
+                  <span className="text-xs text-[var(--text-primary)]">
                     {selectedProblem.time_taken} minutes
                   </span>
                 </div>
               )}
               {selectedProblem.notes && (
-                <div className="bg-[#1a1a1a] rounded-xl p-3">
-                  <p className="text-xs text-[#555555] mb-1">Notes</p>
-                  <p className="text-sm text-white">{selectedProblem.notes}</p>
+                <div className="bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3">
+                  <p className="text-xs text-[var(--text-muted)] mb-1">Notes</p>
+                  <p className="text-sm text-[var(--text-primary)]">{selectedProblem.notes}</p>
                 </div>
               )}
             </div>

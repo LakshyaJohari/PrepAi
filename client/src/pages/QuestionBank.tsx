@@ -59,36 +59,40 @@ export default function QuestionBank() {
   }
 
   const typeColor = (t: string) => ({
-    behavioral: 'bg-indigo-400/10 text-indigo-400',
-    technical: 'bg-teal-400/10 text-teal-400',
-    system_design: 'bg-purple-400/10 text-purple-400',
-  }[t] || 'bg-[#1a1a1a] text-[#555555]')
+    behavioral: 'bg-[var(--accent-dim)] text-[var(--accent)]',
+    technical: 'bg-[var(--teal-dim)] text-[var(--teal)]',
+    system_design: 'bg-[var(--info-dim)] text-[var(--info)]',
+  }[t] || 'bg-[var(--bg-elevated)] text-[var(--text-muted)]')
 
   const diffColor = (d: string) => ({
-    easy: 'bg-green-400/10 text-green-400',
-    medium: 'bg-amber-400/10 text-amber-400',
-    hard: 'bg-red-400/10 text-red-400',
+    easy: 'bg-[var(--success-dim)] text-[var(--success)]',
+    medium: 'bg-[var(--warning-dim)] text-[var(--warning)]',
+    hard: 'bg-[var(--danger-dim)] text-[var(--danger)]',
   }[d] || '')
 
   const filterBtn = (active: boolean) =>
-    `px-2.5 py-1 rounded-lg text-xs transition-colors ${active ? 'bg-white text-black font-medium' : 'bg-[#1a1a1a] text-[#666666] hover:text-white'}`
+    `px-2.5 py-1 rounded-[var(--radius-sm)] text-xs transition-colors duration-150 border ${
+      active
+        ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+        : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border-[var(--border-subtle)]'
+    }`
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-black text-white">Question Bank</h1>
-        <p className="text-[#666666] text-sm mt-1">{filtered.length} questions</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Question Bank</h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">{filtered.length} questions</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-4 space-y-3">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 space-y-3">
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444444]" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search questions..."
-            className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white transition-colors placeholder-[#444444]"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] pl-9 pr-4 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
           />
         </div>
         <div className="flex gap-4 flex-wrap">
@@ -113,21 +117,21 @@ export default function QuestionBank() {
       {/* Questions */}
       <div className="space-y-2">
         {filtered.map((q, i) => (
-          <div key={i} className="bg-[#0D0D0D] border border-[#1a1a1a] hover:border-[#333333] rounded-xl p-4 flex items-start justify-between gap-4 transition-colors">
+          <div key={i} className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] rounded-[var(--radius-md)] p-4 flex items-start justify-between gap-4 transition-colors duration-150">
             <div className="flex-1">
-              <p className="text-sm text-white mb-2">{q.question}</p>
+              <p className="text-sm text-[var(--text-primary)] mb-2">{q.question}</p>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-[#444444]">{q.company}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${typeColor(q.type)}`}>{q.type.replace('_', ' ')}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${diffColor(q.difficulty)}`}>{q.difficulty}</span>
+                <span className="text-xs font-medium text-[var(--text-muted)]">{q.company}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-[var(--radius-sm)] ${typeColor(q.type)}`}>{q.type.replace('_', ' ')}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-[var(--radius-sm)] ${diffColor(q.difficulty)}`}>{q.difficulty}</span>
               </div>
             </div>
             <button
               onClick={() => toggleSave(q)}
-              className="flex-shrink-0 text-[#444444] hover:text-white transition-colors mt-0.5"
+              className="flex-shrink-0 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150 mt-0.5"
             >
               {saved.includes(q.question)
-                ? <BookmarkCheck size={18} className="text-indigo-400" />
+                ? <BookmarkCheck size={18} className="text-[var(--accent)]" />
                 : <Bookmark size={18} />}
             </button>
           </div>

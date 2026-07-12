@@ -1,3 +1,4 @@
+import dns from 'dns'
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -7,6 +8,12 @@ import problemsRouter from './routes/problems'
 // @ts-ignore
 import contestRouter from './routes/contests'
 dotenv.config()
+
+// Some networks (campus/corporate) blackhole outbound IPv6 while allowing
+// IPv4, which makes Node's fetch (undici) hang until timeout on APIs that
+// publish AAAA records (e.g. Groq, which sits behind Cloudflare). Prefer
+// IPv4 resolution so those requests don't race a dead IPv6 route first.
+dns.setDefaultResultOrder('ipv4first')
 
 const app = express()
 

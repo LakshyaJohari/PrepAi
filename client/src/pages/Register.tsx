@@ -25,41 +25,41 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-white mb-1">Create account</h1>
-        <p className="text-gray-400 text-sm mb-6">Start your interview prep journey</p>
-        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg p-3 mb-4">{error}</div>}
+    <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center px-4">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-8 w-full max-w-md shadow-[var(--shadow-md)]">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Create account</h1>
+        <p className="text-[var(--text-secondary)] text-sm mb-6">Start your interview prep journey</p>
+        {error && <div className="bg-[var(--danger-dim)] border border-[var(--danger-border)] text-[var(--danger)] text-sm rounded-[var(--radius-md)] p-3 mb-4">{error}</div>}
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Full Name</label>
+            <label className="text-sm text-[var(--text-secondary)] mb-1 block">Full Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150"
               placeholder="Lakshya Johari"
               required
             />
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Email</label>
+            <label className="text-sm text-[var(--text-secondary)] mb-1 block">Email</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150"
               placeholder="you@example.com"
               required
             />
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Password</label>
+            <label className="text-sm text-[var(--text-secondary)] mb-1 block">Password</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150"
               placeholder="••••••••"
               required
             />
@@ -67,13 +67,13 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
+            className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius-md)] py-2.5 text-sm font-medium transition-all duration-150 disabled:opacity-50"
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
-        <p className="text-gray-500 text-sm text-center mt-4">
-          Already have an account? <Link to="/login" className="text-indigo-400 hover:text-indigo-300">Login</Link>
+        <p className="text-[var(--text-muted)] text-sm text-center mt-4">
+          Already have an account? <Link to="/login" className="text-[var(--accent)] hover:text-[var(--accent-hover)]">Login</Link>
         </p>
       </div>
     </div>

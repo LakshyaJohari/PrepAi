@@ -13,6 +13,12 @@ const roundTypes = [
 
 const difficulties = ['Easy', 'Medium', 'Hard']
 
+const difficultyStyle: Record<string, string> = {
+  Easy: 'bg-[var(--success-dim)] text-[var(--success)] border border-[var(--success-border)]',
+  Medium: 'bg-[var(--warning-dim)] text-[var(--warning)] border border-[var(--warning-border)]',
+  Hard: 'bg-[var(--danger-dim)] text-[var(--danger)] border border-[var(--danger-border)]',
+}
+
 export default function InterviewConfig() {
   const navigate = useNavigate()
   const [company, setCompany] = useState('Google')
@@ -38,24 +44,24 @@ export default function InterviewConfig() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-4">
       <div>
-        <h1 className="text-3xl font-black text-white">New Mock Interview</h1>
-        <p className="text-[#666666] text-sm mt-1">Configure your interview session</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">New Mock Interview</h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">Configure your interview session</p>
       </div>
 
       {/* Company */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-        <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-3">Company</label>
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+        <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-3">Company</label>
         <div className="flex flex-wrap gap-2">
           {companies.map(c => (
             <button
               key={c}
               onClick={() => setCompany(c)}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+              className={`px-3 py-1.5 rounded-[var(--radius-md)] text-sm transition-colors duration-150 ${
                 company === c
-                  ? 'bg-white text-black font-medium'
-                  : 'bg-[#1a1a1a] text-[#888888] hover:text-white hover:bg-[#222222]'
+                  ? 'bg-[var(--accent)] text-white font-medium'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]'
               }`}
             >
               {c}
@@ -65,53 +71,51 @@ export default function InterviewConfig() {
       </div>
 
       {/* Role */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-        <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-3">Role</label>
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+        <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-3">Role</label>
         <input
           type="text"
           value={role}
           onChange={e => setRole(e.target.value)}
-          className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors placeholder-[#444444]"
+          className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
           placeholder="e.g. Software Engineer, Product Manager"
         />
       </div>
 
       {/* Round Type */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-        <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-3">Round Type</label>
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+        <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-3">Round Type</label>
         <div className="grid grid-cols-3 gap-3">
           {roundTypes.map(({ value, label, icon: Icon, desc }) => (
             <button
               key={value}
               onClick={() => setRoundType(value)}
-              className={`p-4 rounded-xl border-2 text-left transition-colors ${
+              className={`p-4 rounded-[var(--radius-lg)] border text-left transition-colors duration-150 ${
                 roundType === value
-                  ? 'border-white bg-white/5'
-                  : 'border-[#1a1a1a] hover:border-[#333333]'
+                  ? 'border-[var(--accent)] bg-[var(--accent-dim)]'
+                  : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)]'
               }`}
             >
-              <Icon size={18} className={roundType === value ? 'text-white' : 'text-[#555555]'} />
-              <div className={`font-medium text-sm mt-2 ${roundType === value ? 'text-white' : 'text-[#888888]'}`}>{label}</div>
-              <div className="text-xs text-[#555555] mt-0.5">{desc}</div>
+              <Icon size={18} className={roundType === value ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'} />
+              <div className={`font-medium text-sm mt-2 ${roundType === value ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>{label}</div>
+              <div className="text-xs text-[var(--text-muted)] mt-0.5">{desc}</div>
             </button>
           ))}
         </div>
       </div>
 
       {/* Difficulty */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-        <label className="text-xs font-medium text-[#555555] uppercase tracking-widest block mb-3">Difficulty</label>
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+        <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-3">Difficulty</label>
         <div className="flex gap-3">
           {difficulties.map(d => (
             <button
               key={d}
               onClick={() => setDifficulty(d)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              className={`flex-1 py-2.5 rounded-[var(--radius-md)] text-sm font-medium transition-colors duration-150 ${
                 difficulty === d
-                  ? d === 'Easy' ? 'bg-green-400/20 text-green-400 border border-green-400/30'
-                  : d === 'Medium' ? 'bg-amber-400/20 text-amber-400 border border-amber-400/30'
-                  : 'bg-red-400/20 text-red-400 border border-red-400/30'
-                  : 'bg-[#1a1a1a] text-[#555555] border border-transparent hover:border-[#333333]'
+                  ? difficultyStyle[d]
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
               }`}
             >
               {d}
@@ -123,7 +127,7 @@ export default function InterviewConfig() {
       <button
         onClick={handleStart}
         disabled={loading || !role}
-        className="w-full bg-white hover:bg-gray-100 disabled:opacity-50 text-black font-semibold rounded-xl py-3 text-sm transition-colors"
+        className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 text-white font-semibold rounded-[var(--radius-md)] py-3 text-sm transition-all duration-150"
       >
         {loading ? 'Starting interview...' : 'Start Interview →'}
       </button>

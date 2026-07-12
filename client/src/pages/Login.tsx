@@ -51,23 +51,23 @@ function MonitorAnimation() {
 
   return (
     <div
-      className="flex flex-col items-center cursor-pointer"
+      className="flex flex-col items-center cursor-pointer no-transition"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="w-64 h-44 bg-black border-4 border-[#333333] rounded-2xl overflow-hidden shadow-2xl relative">
+      <div className="monitor-screen w-64 h-44 border-4 border-[#333333] rounded-[var(--radius-lg)] overflow-hidden shadow-2xl relative">
         <div className="absolute top-2 left-3 w-8 h-1.5 bg-white/10 rounded-full" />
         <div className="p-4 font-mono h-full">
           {!isHovered && !displayedCode ? (
             <div className="flex flex-col items-center justify-center h-full gap-2">
-              <div className="w-2 h-5 bg-green-400 animate-pulse" />
+              <div className="w-2 h-5 bg-[#3DD68C] animate-pulse" />
               <p className="text-[#555555] text-xs"></p>
             </div>
           ) : (
-            <pre className="text-green-400 whitespace-pre-wrap leading-5 text-xs">
+            <pre className="whitespace-pre-wrap leading-5 text-xs">
               {displayedCode}
               {isHovered && (
-                <span className="inline-block w-1.5 h-3.5 bg-green-400 animate-pulse ml-0.5 align-middle" />
+                <span className="inline-block w-1.5 h-3.5 bg-[#3DD68C] animate-pulse ml-0.5 align-middle" />
               )}
             </pre>
           )}
@@ -76,7 +76,7 @@ function MonitorAnimation() {
       </div>
       <div className="w-4 h-5 bg-[#333333] mx-auto" />
       <div className="w-24 h-2.5 bg-[#333333] rounded-full mx-auto" />
-      
+
     </div>
   );
 }
@@ -90,6 +90,11 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("prepai-theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,50 +153,50 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="w-full max-w-4xl bg-[#0D0D0D] border border-[#222222] rounded-3xl overflow-hidden flex shadow-2xl">
+    <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center px-4">
+      <div className="w-full max-w-4xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] overflow-hidden flex shadow-[var(--shadow-lg)]">
         {/* Left panel */}
-        <div className="w-1/2 bg-[#111111] p-12 flex flex-col border-r border-[#222222]">
-          <Logo size="lg" dark={true} />
+        <div className="w-1/2 bg-[var(--bg-elevated)] p-12 flex flex-col border-r border-[var(--border-subtle)]">
+          <Logo size="lg" />
           <div className="flex-1 flex flex-col items-center justify-center gap-6 my-8">
             <MonitorAnimation />
-            <p className="text-[#888888] text-sm text-center mt-4 italic">
+            <p className="text-[var(--text-secondary)] text-sm text-center mt-4 italic">
               "Practice like it's real. Perform like a pro."
             </p>
           </div>
           <div className="flex gap-6 text-center justify-center">
             <div>
-              <div className="text-xl font-bold text-white">500+</div>
-              <div className="text-xs text-[#666666]">Questions</div>
+              <div className="text-xl font-bold text-[var(--text-primary)]">500+</div>
+              <div className="text-xs text-[var(--text-muted)]">Questions</div>
             </div>
-            <div className="w-px bg-[#222222]" />
+            <div className="w-px bg-[var(--border-subtle)]" />
             <div>
-              <div className="text-xl font-bold text-white">AI</div>
-              <div className="text-xs text-[#666666]">Powered</div>
+              <div className="text-xl font-bold text-[var(--text-primary)]">AI</div>
+              <div className="text-xs text-[var(--text-muted)]">Powered</div>
             </div>
-            <div className="w-px bg-[#222222]" />
+            <div className="w-px bg-[var(--border-subtle)]" />
             <div>
-              <div className="text-xl font-bold text-white">Free</div>
-              <div className="text-xs text-[#666666]">Forever</div>
+              <div className="text-xl font-bold text-[var(--text-primary)]">Free</div>
+              <div className="text-xs text-[var(--text-muted)]">Forever</div>
             </div>
           </div>
         </div>
 
         {/* Right panel */}
-        <div className="w-1/2 p-12 flex flex-col justify-center">
+        <div className="w-1/2 bg-[var(--bg-surface)] p-12 flex flex-col justify-center">
           {/* Mode tabs */}
           {mode !== "forgot" && (
-            <div className="flex bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-1 mb-8">
+            <div className="flex bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-1 mb-8">
               <button
                 onClick={() => {
                   setMode("login");
                   setError("");
                   setMessage("");
                 }}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex-1 py-2 rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-150 ${
                   mode === "login"
-                    ? "bg-white text-black"
-                    : "text-[#888888] hover:text-white"
+                    ? "bg-[var(--bg-overlay)] text-[var(--text-primary)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 Login
@@ -202,10 +207,10 @@ export default function Login() {
                   setError("");
                   setMessage("");
                 }}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex-1 py-2 rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-150 ${
                   mode === "register"
-                    ? "bg-white text-black"
-                    : "text-[#888888] hover:text-white"
+                    ? "bg-[var(--bg-overlay)] text-[var(--text-primary)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 Register
@@ -213,18 +218,18 @@ export default function Login() {
             </div>
           )}
 
-          <h1 className="text-3xl font-bold text-white mb-1">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1">
             {titles[mode].heading}
           </h1>
-          <p className="text-[#888888] text-sm mb-6">{titles[mode].sub}</p>
+          <p className="text-[var(--text-secondary)] text-sm mb-6">{titles[mode].sub}</p>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl p-3 mb-4">
+            <div className="bg-[var(--danger-dim)] border border-[var(--danger-border)] text-[var(--danger)] text-sm rounded-[var(--radius-md)] p-3 mb-4">
               {error}
             </div>
           )}
           {message && (
-            <div className="bg-green-500/10 border border-green-500/20 text-green-400 text-sm rounded-xl p-3 mb-4">
+            <div className="bg-[var(--success-dim)] border border-[var(--success-border)] text-[var(--success)] text-sm rounded-[var(--radius-md)] p-3 mb-4">
               {message}
             </div>
           )}
@@ -234,7 +239,7 @@ export default function Login() {
             <>
               <button
                 onClick={handleGoogle}
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-black font-medium rounded-xl py-2.5 text-sm transition-colors mb-4"
+                className="w-full flex items-center justify-center gap-3 bg-[var(--bg-elevated)] hover:bg-[var(--bg-overlay)] border border-[var(--border-default)] text-[var(--text-primary)] font-medium rounded-[var(--radius-md)] py-2.5 text-sm transition-all duration-150 mb-4"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18">
                   <path
@@ -257,11 +262,11 @@ export default function Login() {
                 Continue with Google
               </button>
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-[#222222]" />
-                <span className="text-[#555555] text-xs">
+                <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+                <span className="text-[var(--text-muted)] text-xs">
                   or sign in with email
                 </span>
-                <div className="flex-1 h-px bg-[#222222]" />
+                <div className="flex-1 h-px bg-[var(--border-subtle)]" />
               </div>
             </>
           )}
@@ -269,14 +274,14 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div>
-                <label className="text-xs font-medium text-[#888888] uppercase tracking-wider block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
                   Full Name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors placeholder-[#444444]"
+                  className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
                   placeholder="Lakshya Johari"
                   required
                 />
@@ -284,19 +289,19 @@ export default function Login() {
             )}
 
             <div>
-              <label className="text-xs font-medium text-[#888888] uppercase tracking-wider block mb-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
                 Email Address
               </label>
               <div className="relative">
                 <Mail
                   size={14}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555555]"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors placeholder-[#444444]"
+                  className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] pl-10 pr-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
                   placeholder="you@example.com"
                   required
                 />
@@ -305,19 +310,19 @@ export default function Login() {
 
             {mode !== "forgot" && (
               <div>
-                <label className="text-xs font-medium text-[#888888] uppercase tracking-wider block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] block mb-1.5">
                   Password
                 </label>
                 <div className="relative">
                   <Lock
                     size={14}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555555]"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
                   />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors placeholder-[#444444]"
+                    className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] pl-10 pr-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
                     placeholder="••••••••"
                     required
                   />
@@ -328,7 +333,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white hover:bg-gray-100 disabled:opacity-50 text-black font-semibold rounded-xl py-2.5 text-sm transition-colors mt-2"
+              className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 text-white font-semibold rounded-[var(--radius-md)] py-2.5 text-sm transition-all duration-150 mt-2"
             >
               {loading
                 ? "Please wait..."
@@ -347,7 +352,7 @@ export default function Login() {
                 setError("");
                 setMessage("");
               }}
-              className="text-blue-500 hover:text-blue-400 text-xs text-center mt-4 w-full"
+              className="text-[var(--accent)] hover:text-[var(--accent-hover)] text-xs text-center mt-4 w-full"
             >
               Forgot your password?
             </button>
@@ -360,7 +365,7 @@ export default function Login() {
                 setError("");
                 setMessage("");
               }}
-              className="text-[#666666] hover:text-white text-xs text-center mt-4 w-full"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs text-center mt-4 w-full"
             >
               ← Back to login
             </button>

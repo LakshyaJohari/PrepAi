@@ -12,10 +12,14 @@ export default function Layout({ children }: LayoutProps) {
     (pathname.startsWith("/problems/") && pathname !== "/problems") ||
     pathname.startsWith("/contest/");
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
       <Navbar />
       <main
-        className={isFullHeight ? "pt-14" : "pt-14 max-w-6xl mx-auto px-6 py-8"}
+        className={
+          isFullHeight
+            ? "pt-[var(--nav-height)]"
+            : "pt-[var(--nav-height)] max-w-5xl mx-auto px-6 py-8"
+        }
       >
         {children}
       </main>

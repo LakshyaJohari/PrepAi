@@ -48,7 +48,7 @@ function ContestCountdown({ endTime }: { endTime: string }) {
     const i = setInterval(update, 1000)
     return () => clearInterval(i)
   }, [endTime])
-  return <span className="font-mono font-bold text-amber-400">{timeLeft}</span>
+  return <span className="font-mono font-semibold text-[var(--warning)]">{timeLeft}</span>
 }
 
 function ContestStartCountdown({ startTime }: { startTime: string }) {
@@ -66,7 +66,7 @@ function ContestStartCountdown({ startTime }: { startTime: string }) {
     const i = setInterval(update, 1000)
     return () => clearInterval(i)
   }, [startTime])
-  return <span className="font-mono font-bold text-blue-400">{timeLeft}</span>
+  return <span className="font-mono font-semibold text-[var(--info)]">{timeLeft}</span>
 }
 
 export default function Dashboard() {
@@ -154,38 +154,40 @@ export default function Dashboard() {
   }, [user])
 
   const diffColor = (d: string) => ({
-    easy: 'text-green-400 bg-green-400/10 border-green-400/20',
-    medium: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    hard: 'text-red-400 bg-red-400/10 border-red-400/20',
+    easy: 'badge-easy',
+    medium: 'badge-medium',
+    hard: 'badge-hard',
   }[d?.toLowerCase()] || '')
 
   const scoreColor = (s: number | null) => {
-    if (!s) return 'text-[#444444]'
-    return s >= 80 ? 'text-green-400' : s >= 60 ? 'text-amber-400' : 'text-red-400'
+    if (!s) return 'text-[var(--text-disabled)]'
+    return s >= 80 ? 'text-[var(--success)]' : s >= 60 ? 'text-[var(--warning)]' : 'text-[var(--danger)]'
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-4">
 
       {/* Hero greeting */}
-      <div className="text-center py-8">
-        <h1 className="text-4xl font-black text-white mb-2">Hey, {firstName} 👋</h1>
-        <p className="text-[#666666] text-lg">Ready to ace your next interview?</p>
-        <div className="flex items-center justify-center gap-8 mt-6">
-          <div className="text-center">
-            <div className="text-2xl font-black text-blue-400">{streak}</div>
-            <div className="text-xs text-[#555555] mt-0.5">Day Streak 🔥</div>
-          </div>
-          <div className="w-px h-8 bg-[#1a1a1a]" />
-          <div className="text-center">
-            <div className="text-2xl font-black text-teal-400">{problemCount}</div>
-            <div className="text-xs text-[#555555] mt-0.5">Problems Solved</div>
-          </div>
-          <div className="w-px h-8 bg-[#1a1a1a]" />
-          <div className="text-center">
-            <div className="text-2xl font-black text-indigo-400">{sessions.length}</div>
-            <div className="text-xs text-[#555555] mt-0.5">Interviews Done</div>
-          </div>
+      <div className="text-center py-6">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Hey, {firstName} 👋</h1>
+        <p className="text-[var(--text-secondary)] text-sm">Ready to ace your next interview?</p>
+      </div>
+
+      {/* Stats row */}
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] px-6 py-4 flex items-center justify-center gap-8">
+        <div className="text-center">
+          <div className="text-xl font-bold text-[var(--text-primary)]">{streak}</div>
+          <div className="text-xs text-[var(--text-muted)] mt-0.5">Day Streak 🔥</div>
+        </div>
+        <div className="w-px h-6 bg-[var(--border-subtle)]" />
+        <div className="text-center">
+          <div className="text-xl font-bold text-[var(--text-primary)]">{problemCount}</div>
+          <div className="text-xs text-[var(--text-muted)] mt-0.5">Problems Solved</div>
+        </div>
+        <div className="w-px h-6 bg-[var(--border-subtle)]" />
+        <div className="text-center">
+          <div className="text-xl font-bold text-[var(--text-primary)]">{sessions.length}</div>
+          <div className="text-xs text-[var(--text-muted)] mt-0.5">Interviews Done</div>
         </div>
       </div>
 
@@ -193,24 +195,24 @@ export default function Dashboard() {
       {activeContest && (
         <div
           onClick={() => navigate(`/contest/${activeContest.id}`)}
-          className="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-green-500/50 transition-colors"
+          className="bg-[var(--bg-surface)] border border-[var(--success-border)] rounded-[var(--radius-lg)] p-4 flex items-center justify-between cursor-pointer hover:border-[var(--border-strong)] transition-colors duration-150"
         >
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Trophy size={20} className="text-green-400" />
+            <div className="w-10 h-10 bg-[var(--success-dim)] rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0">
+              <Trophy size={20} className="text-[var(--success)]" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full border border-green-400/20">● Live Now</span>
+                <span className="badge badge-active">● Live Now</span>
               </div>
-              <h3 className="font-bold text-white">{activeContest.title}</h3>
-              <div className="flex items-center gap-1.5 text-xs text-[#555555] mt-0.5">
+              <h3 className="font-semibold text-[var(--text-primary)] text-sm">{activeContest.title}</h3>
+              <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] mt-0.5">
                 <Clock size={11} />
                 <ContestCountdown endTime={activeContest.end_time} /> remaining
               </div>
             </div>
           </div>
-          <button className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition-colors flex-shrink-0">
+          <button className="btn btn-primary flex-shrink-0">
             Enter <ArrowRight size={14} />
           </button>
         </div>
@@ -220,55 +222,55 @@ export default function Dashboard() {
       {upcomingContest && !activeContest && (
         <div
           onClick={() => navigate('/contest')}
-          className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 border border-blue-500/30 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-blue-500/50 transition-colors"
+          className="bg-[var(--bg-surface)] border border-[var(--info-border)] rounded-[var(--radius-lg)] p-4 flex items-center justify-between cursor-pointer hover:border-[var(--border-strong)] transition-colors duration-150"
         >
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Trophy size={20} className="text-blue-400" />
+            <div className="w-10 h-10 bg-[var(--info-dim)] rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0">
+              <Trophy size={20} className="text-[var(--info)]" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-full border border-blue-400/20">◷ Upcoming</span>
+                <span className="badge badge-upcoming">◷ Upcoming</span>
               </div>
-              <h3 className="font-bold text-white">{upcomingContest.title}</h3>
-              <div className="flex items-center gap-1.5 text-xs text-[#555555] mt-0.5">
+              <h3 className="font-semibold text-[var(--text-primary)] text-sm">{upcomingContest.title}</h3>
+              <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] mt-0.5">
                 Starts in <ContestStartCountdown startTime={upcomingContest.start_time} />
               </div>
             </div>
           </div>
-          <ArrowRight size={16} className="text-blue-400" />
+          <ArrowRight size={16} className="text-[var(--info)]" />
         </div>
       )}
 
       {/* Question of the Day */}
       {dailyProblem && (
-        <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-6 hover:border-[#333333] transition-colors">
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 hover:border-[var(--border-strong)] transition-colors duration-150">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-blue-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] flex items-center gap-1.5">
                   <Calendar size={12} /> Question of the Day
                 </span>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full border capitalize ${diffColor(dailyProblem.difficulty)}`}>
+                <span className={`badge capitalize ${diffColor(dailyProblem.difficulty)}`}>
                   {dailyProblem.difficulty}
                 </span>
               </div>
-              <h2 className="text-xl font-black text-white mb-3">{dailyProblem.title}</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3">{dailyProblem.title}</h2>
               <div className="flex flex-wrap gap-2 mb-4">
                 {dailyProblem.topics?.slice(0, 3).map(t => (
-                  <span key={t} className="text-xs bg-[#1a1a1a] text-[#666666] px-2.5 py-1 rounded-full">{t}</span>
+                  <span key={t} className="badge badge-topic">{t}</span>
                 ))}
                 {dailyProblem.companies?.slice(0, 2).map(c => (
-                  <span key={c} className="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full">{c}</span>
+                  <span key={c} className="text-xs bg-[var(--accent-dim)] text-[var(--accent)] px-2 py-0.5 rounded-[var(--radius-sm)]">{c}</span>
                 ))}
               </div>
-              <div className="flex items-center gap-4 text-xs text-[#444444]">
+              <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
                 <span className="flex items-center gap-1"><Clock size={11} /> {timeLeft} left to solve</span>
               </div>
             </div>
             <button
               onClick={() => navigate(`/problems/${dailyProblem.slug}`)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors ml-6 flex-shrink-0"
+              className="btn btn-primary ml-6 flex-shrink-0"
             >
               Solve now <ArrowRight size={14} />
             </button>
@@ -280,28 +282,28 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={() => navigate('/problems')}
-          className="bg-[#0D0D0D] border border-[#1a1a1a] hover:border-[#333333] rounded-2xl p-6 text-left transition-colors group"
+          className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] rounded-[var(--radius-lg)] p-5 text-left transition-colors duration-150 group"
         >
-          <div className="w-10 h-10 bg-teal-400/10 rounded-xl flex items-center justify-center mb-4">
-            <Code size={20} className="text-teal-400" />
+          <div className="w-8 h-8 bg-[var(--accent-dim)] rounded-[var(--radius-md)] flex items-center justify-center mb-3">
+            <Code size={16} className="text-[var(--accent)]" />
           </div>
-          <h3 className="text-lg font-black text-white mb-1">Start Practicing</h3>
-          <p className="text-sm text-[#555555] mb-4">200+ problems across all topics and companies</p>
-          <div className="flex items-center gap-1 text-teal-400 text-sm font-medium group-hover:gap-2 transition-all">
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Start Practicing</h3>
+          <p className="text-xs text-[var(--text-secondary)] mb-4">200+ problems across all topics and companies</p>
+          <div className="flex items-center gap-1 text-[var(--accent)] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
             Browse Problems <ArrowRight size={14} />
           </div>
         </button>
 
         <button
           onClick={() => navigate('/interview/new')}
-          className="bg-[#0D0D0D] border border-[#1a1a1a] hover:border-[#333333] rounded-2xl p-6 text-left transition-colors group"
+          className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] rounded-[var(--radius-lg)] p-5 text-left transition-colors duration-150 group"
         >
-          <div className="w-10 h-10 bg-indigo-400/10 rounded-xl flex items-center justify-center mb-4">
-            <Mic size={20} className="text-indigo-400" />
+          <div className="w-8 h-8 bg-[var(--accent-dim)] rounded-[var(--radius-md)] flex items-center justify-center mb-3">
+            <Mic size={16} className="text-[var(--accent)]" />
           </div>
-          <h3 className="text-lg font-black text-white mb-1">Mock Interview</h3>
-          <p className="text-sm text-[#555555] mb-4">AI-powered interviews tailored to your target company</p>
-          <div className="flex items-center gap-1 text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Mock Interview</h3>
+          <p className="text-xs text-[var(--text-secondary)] mb-4">AI-powered interviews tailored to your target company</p>
+          <div className="flex items-center gap-1 text-[var(--accent)] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
             Start Interview <ArrowRight size={14} />
           </div>
         </button>
@@ -310,25 +312,26 @@ export default function Dashboard() {
       {/* Recent Sessions */}
       {sessions.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-medium text-[#555555] uppercase tracking-widest">Recent Interviews</h2>
-            <button onClick={() => navigate('/profile')} className="text-xs text-indigo-400 hover:text-indigo-300">View all →</button>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">Recent Interviews</span>
+            <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+            <button onClick={() => navigate('/profile')} className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">View all →</button>
           </div>
           <div className="space-y-2">
             {sessions.map(s => (
-              <div key={s.id} className="bg-[#0D0D0D] border border-[#1a1a1a] hover:border-[#333333] rounded-xl p-4 flex items-center justify-between transition-colors">
+              <div key={s.id} className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] rounded-[var(--radius-md)] px-4 py-3 flex items-center justify-between transition-colors duration-150">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-white text-sm">{s.company}</span>
-                    <span className="text-[#333333]">·</span>
-                    <span className="text-sm text-[#666666]">{s.role}</span>
+                    <span className="font-semibold text-[var(--text-primary)] text-sm">{s.company}</span>
+                    <span className="text-[var(--border-strong)]">·</span>
+                    <span className="text-sm text-[var(--text-secondary)]">{s.role}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-[#444444] capitalize">{s.round_type?.replace('_', ' ')}</span>
-                    <span className="text-xs text-[#333333]">{new Date(s.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs text-[var(--text-muted)] capitalize">{s.round_type?.replace('_', ' ')}</span>
+                    <span className="text-xs text-[var(--text-disabled)]">{new Date(s.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
-                <div className={`text-xl font-black ${scoreColor(s.overall_score)}`}>
+                <div className={`text-xl font-bold ${scoreColor(s.overall_score)}`}>
                   {s.overall_score ?? '—'}
                 </div>
               </div>
@@ -341,18 +344,18 @@ export default function Dashboard() {
       {!activeContest && !upcomingContest && (
         <div
           onClick={() => navigate('/contest')}
-          className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/20 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-indigo-500/40 transition-colors"
+          className="bg-[var(--bg-surface)] border border-[var(--accent-border)] rounded-[var(--radius-lg)] p-4 flex items-center justify-between cursor-pointer hover:border-[var(--border-strong)] transition-colors duration-150"
         >
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center">
-              <Trophy size={20} className="text-indigo-400" />
+            <div className="w-10 h-10 bg-[var(--accent-dim)] rounded-[var(--radius-md)] flex items-center justify-center">
+              <Trophy size={20} className="text-[var(--accent)]" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm">Weekly Contest</h3>
-              <p className="text-xs text-[#555555] mt-0.5">No active contest — check back soon or schedule one</p>
+              <h3 className="font-semibold text-[var(--text-primary)] text-sm">Weekly Contest</h3>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">No active contest — check back soon or schedule one</p>
             </div>
           </div>
-          <ArrowRight size={16} className="text-indigo-400" />
+          <ArrowRight size={16} className="text-[var(--accent)]" />
         </div>
       )}
     </div>

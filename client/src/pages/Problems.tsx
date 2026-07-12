@@ -57,51 +57,49 @@ export default function Problems() {
   const totalPages = Math.ceil(filtered.length / perPage)
 
   const diffColor = (d: string) => ({
-    easy: 'text-green-400',
-    medium: 'text-amber-400',
-    hard: 'text-red-400',
-  }[d] || 'text-[#555555]')
-
-  const diffBg = (d: string) => ({
-    easy: 'bg-green-400/10 text-green-400',
-    medium: 'bg-amber-400/10 text-amber-400',
-    hard: 'bg-red-400/10 text-red-400',
-  }[d] || '')
+    easy: 'text-[var(--success)]',
+    medium: 'text-[var(--warning)]',
+    hard: 'text-[var(--danger)]',
+  }[d] || 'text-[var(--text-muted)]')
 
   const filterBtn = (active: boolean) =>
-    `px-3 py-1.5 rounded-lg text-xs transition-colors ${active ? 'bg-white text-black font-medium' : 'bg-[#1a1a1a] text-[#666666] hover:text-white'}`
+    `px-2.5 py-1 rounded-[var(--radius-sm)] text-xs transition-colors duration-150 border ${
+      active
+        ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+        : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border-[var(--border-subtle)]'
+    }`
 
   const easyCount = problems.filter(p => p.difficulty === 'easy').length
   const medCount = problems.filter(p => p.difficulty === 'medium').length
   const hardCount = problems.filter(p => p.difficulty === 'hard').length
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-white">Problems</h1>
-          <p className="text-[#666666] text-sm mt-1">{problems.length} problems · {easyCount} easy · {medCount} medium · {hardCount} hard</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Problems</h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">{problems.length} problems · {easyCount} easy · {medCount} medium · {hardCount} hard</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-4 space-y-3">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 space-y-3">
         {/* Search */}
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444444]" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && fetchProblems()}
             placeholder="Search problems..."
-            className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white placeholder-[#444444]"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-md)] pl-9 pr-4 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-border)] transition-all duration-150 placeholder-[var(--text-muted)]"
           />
         </div>
 
         {/* Difficulty */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-[#444444] flex items-center gap-1"><Filter size={12} /> Difficulty:</span>
+          <span className="text-xs text-[var(--text-muted)] flex items-center gap-1"><Filter size={12} /> Difficulty:</span>
           {difficulties.map(d => (
             <button key={d} onClick={() => setDifficulty(d)} className={filterBtn(difficulty === d)}>
               {d === 'All' ? 'All' : d.charAt(0).toUpperCase() + d.slice(1)}
@@ -111,7 +109,7 @@ export default function Problems() {
 
         {/* Topics */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-[#444444]">Topic:</span>
+          <span className="text-xs text-[var(--text-muted)]">Topic:</span>
           {topics.map(t => (
             <button key={t} onClick={() => setTopic(t)} className={filterBtn(topic === t)}>{t}</button>
           ))}
@@ -119,7 +117,7 @@ export default function Problems() {
 
         {/* Companies */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-[#444444]">Company:</span>
+          <span className="text-xs text-[var(--text-muted)]">Company:</span>
           {companies.map(c => (
             <button key={c} onClick={() => setCompany(c)} className={filterBtn(company === c)}>{c}</button>
           ))}
@@ -127,29 +125,29 @@ export default function Problems() {
       </div>
 
       {/* Problems table */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl overflow-hidden">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-[#111111] border-b border-[#1a1a1a]">
+          <thead className="bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)]">
             <tr>
-              <th className="text-left text-xs text-[#444444] uppercase tracking-widest px-5 py-3">#</th>
-              <th className="text-left text-xs text-[#444444] uppercase tracking-widest px-5 py-3">Title</th>
-              <th className="text-left text-xs text-[#444444] uppercase tracking-widest px-5 py-3">Difficulty</th>
-              <th className="text-left text-xs text-[#444444] uppercase tracking-widest px-5 py-3">Topics</th>
-              <th className="text-left text-xs text-[#444444] uppercase tracking-widest px-5 py-3">Companies</th>
+              <th className="text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] px-5 py-3">#</th>
+              <th className="text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] px-5 py-3">Title</th>
+              <th className="text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] px-5 py-3">Difficulty</th>
+              <th className="text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] px-5 py-3">Topics</th>
+              <th className="text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] px-5 py-3">Companies</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#111111]">
+          <tbody className="divide-y divide-[var(--border-subtle)]">
             {loading ? (
               [...Array(10)].map((_, i) => (
                 <tr key={i}>
                   <td colSpan={5} className="px-5 py-3">
-                    <div className="h-4 bg-[#1a1a1a] rounded animate-pulse" />
+                    <div className="h-4 bg-[var(--bg-elevated)] rounded animate-pulse" />
                   </td>
                 </tr>
               ))
             ) : paginated.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-5 py-12 text-center text-[#444444] text-sm">
+                <td colSpan={5} className="px-5 py-12 text-center text-[var(--text-muted)] text-sm">
                   No problems found
                 </td>
               </tr>
@@ -158,25 +156,25 @@ export default function Problems() {
                 <tr
                   key={p.id}
                   onClick={() => navigate(`/problems/${p.slug}`)}
-                  className="hover:bg-white/[0.02] cursor-pointer transition-colors group"
+                  className="hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors duration-150 group"
                 >
-                  <td className="px-5 py-3.5 text-sm text-[#444444]">
+                  <td className="px-5 py-3.5 text-sm text-[var(--text-muted)]">
                     {(page - 1) * perPage + i + 1}
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className="text-sm text-white group-hover:text-indigo-400 transition-colors font-medium">
+                    <span className="text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors duration-150 font-medium">
                       {p.title}
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className={`text-xs font-bold capitalize ${diffColor(p.difficulty)}`}>
+                    <span className={`text-xs font-semibold capitalize ${diffColor(p.difficulty)}`}>
                       {p.difficulty}
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex gap-1 flex-wrap">
                       {p.topics?.slice(0, 2).map(t => (
-                        <span key={t} className="text-xs bg-[#1a1a1a] text-[#666666] px-2 py-0.5 rounded-full">
+                        <span key={t} className="badge badge-topic">
                           {t}
                         </span>
                       ))}
@@ -185,12 +183,12 @@ export default function Problems() {
                   <td className="px-5 py-3.5">
                     <div className="flex gap-1 flex-wrap">
                       {p.companies?.slice(0, 2).map(c => (
-                        <span key={c} className="text-xs bg-[#1a1a1a] text-[#555555] px-2 py-0.5 rounded-full">
+                        <span key={c} className="badge badge-topic">
                           {c}
                         </span>
                       ))}
                       {p.companies?.length > 2 && (
-                        <span className="text-xs text-[#444444]">+{p.companies.length - 2}</span>
+                        <span className="text-xs text-[var(--text-muted)]">+{p.companies.length - 2}</span>
                       )}
                     </div>
                   </td>
@@ -202,15 +200,15 @@ export default function Problems() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-[#1a1a1a]">
-            <span className="text-xs text-[#444444]">
+          <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--border-subtle)]">
+            <span className="text-xs text-[var(--text-muted)]">
               Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, filtered.length)} of {filtered.length}
             </span>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-xs bg-[#1a1a1a] text-[#666666] hover:text-white rounded-lg disabled:opacity-30 transition-colors"
+                className="px-3 py-1.5 text-xs bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] disabled:opacity-30 transition-colors duration-150"
               >
                 ← Prev
               </button>
@@ -220,7 +218,7 @@ export default function Problems() {
                   <button
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
-                    className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${page === pageNum ? 'bg-white text-black font-medium' : 'bg-[#1a1a1a] text-[#666666] hover:text-white'}`}
+                    className={`px-3 py-1.5 text-xs rounded-[var(--radius-md)] transition-colors duration-150 ${page === pageNum ? 'bg-[var(--accent)] text-white font-medium' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                   >
                     {pageNum}
                   </button>
@@ -229,7 +227,7 @@ export default function Problems() {
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-xs bg-[#1a1a1a] text-[#666666] hover:text-white rounded-lg disabled:opacity-30 transition-colors"
+                className="px-3 py-1.5 text-xs bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] disabled:opacity-30 transition-colors duration-150"
               >
                 Next →
               </button>

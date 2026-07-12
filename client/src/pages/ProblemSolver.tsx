@@ -65,24 +65,24 @@ using namespace std;
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    
+
     // Example input: ${exampleInput}
     // Example output: ${exampleOutput}
-    
+
     // Input format: arrays like [1,2,3] are sent as:
     //   Line 1: n (size)
     //   Line 2: space-separated elements
-    
+
     // e.g for array input:
     // int n; cin >> n;
     // vector<int> arr(n);
     // for(int i = 0; i < n; i++) cin >> arr[i];
-    
+
     // Write your solution here
-    
+
     // Print output
     // cout << answer << endl;
-    
+
     return 0;
 }`,
     python: `import sys
@@ -104,14 +104,14 @@ import java.io.*;
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
+
         ${comment.split("\n").join("\n        ")}// Read your input here
         // e.g: int n = Integer.parseInt(br.readLine().trim());
         //      int[] arr = Arrays.stream(br.readLine().split(" "))
         //                        .mapToInt(Integer::parseInt).toArray();
-        
+
         // Write your solution here
-        
+
         // Print output
         // System.out.println(answer);
     }
@@ -123,13 +123,13 @@ process.stdin.on('data', d => inputData += d);
 process.stdin.on('end', () => {
     const lines = inputData.trim().split('\\n');
     const tokens = lines[0].trim().split(/\\s+/);
-    
+
     ${comment.split("\n").join("\n    ")}// Read your input here
     // e.g: const n = parseInt(tokens[0]);
     //      const arr = lines[1].split(' ').map(Number);
-    
+
     // Write your solution here
-    
+
     // Print output
     // console.log(answer);
 });`,
@@ -145,17 +145,17 @@ const languages = [
 function HintItem({ hint, index }: { hint: string; index: number }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-[#1a1a1a]">
+    <div className="border-b border-[var(--border-subtle)]">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm text-[#888888] hover:text-white transition-colors text-left"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-150 text-left"
       >
         <span className="flex items-center gap-2">
-          <Lightbulb size={14} className="text-amber-400" /> Hint {index + 1}
+          <Lightbulb size={14} className="text-[var(--warning)]" /> Hint {index + 1}
         </span>
         {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
-      {open && <div className="px-4 pb-3 text-sm text-[#cccccc]">{hint}</div>}
+      {open && <div className="px-4 pb-3 text-sm text-[var(--text-primary)]">{hint}</div>}
     </div>
   );
 }
@@ -290,24 +290,17 @@ export default function ProblemSolver() {
     };
   }, []);
 
-  const diffColor = (d: string) =>
-    ({
-      easy: "text-green-400",
-      medium: "text-amber-400",
-      hard: "text-red-400",
-    })[d] || "";
-
   const diffBg = (d: string) =>
     ({
-      easy: "bg-green-400/10 text-green-400",
-      medium: "bg-amber-400/10 text-amber-400",
-      hard: "bg-red-400/10 text-red-400",
+      easy: "badge-easy",
+      medium: "badge-medium",
+      hard: "badge-hard",
     })[d] || "";
 
   if (loading)
     return (
       <div className="flex items-center justify-center h-[80vh]">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   if (!problem) return null;
@@ -315,28 +308,26 @@ export default function ProblemSolver() {
   const passedCount = results.filter((r) => r.passed).length;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-black select-none">
+    <div className="flex flex-col h-[calc(100vh-var(--nav-height))] bg-[var(--bg-base)] select-none">
       {/* Top navbar */}
-      <div className="h-11 bg-[#0a0a0a] border-b border-[#1a1a1a] flex items-center justify-between px-4 flex-shrink-0">
+      <div className="h-[var(--nav-height)] bg-[var(--bg-base)] border-b border-[var(--border-subtle)] flex items-center justify-between px-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/problems")}
-            className="text-[#555555] hover:text-white transition-colors p-1"
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150 p-1"
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-white text-sm font-semibold">
+          <span className="text-[var(--text-primary)] text-sm font-semibold">
             {problem.title}
           </span>
-          <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded ${diffBg(problem.difficulty)} capitalize`}
-          >
+          <span className={`badge capitalize ${diffBg(problem.difficulty)}`}>
             {problem.difficulty}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-[#555555] text-xs mr-2">
+          <div className="flex items-center gap-1.5 text-[var(--text-muted)] text-xs font-mono mr-2">
             <Clock size={12} />
             <span>{formatTime(timeElapsed)}</span>
           </div>
@@ -344,7 +335,7 @@ export default function ProblemSolver() {
           <select
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value)}
-            className="bg-[#1a1a1a] border border-[#2a2a2a] text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#444444] cursor-pointer"
+            className="bg-[var(--bg-input)] border border-[var(--border-default)] text-[var(--text-primary)] text-xs px-3 py-1.5 rounded-[var(--radius-md)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
           >
             {languages.map((l) => (
               <option key={l.value} value={l.value}>
@@ -356,16 +347,16 @@ export default function ProblemSolver() {
           <button
             onClick={handleRun}
             disabled={running || submitting}
-            className="flex items-center gap-1.5 bg-[#1a1a1a] hover:bg-[#222222] border border-[#2a2a2a] disabled:opacity-40 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition-colors"
+            className="flex items-center gap-1.5 bg-[var(--bg-elevated)] hover:bg-[var(--border-default)] border border-[var(--border-default)] disabled:opacity-40 text-[var(--text-primary)] font-medium px-3 py-1.5 rounded-[var(--radius-md)] text-xs transition-all duration-150"
           >
             {running ? (
               <>
-                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-3 h-3 border border-[var(--text-primary)] border-t-transparent rounded-full animate-spin" />
                 Running
               </>
             ) : (
               <>
-                <Play size={12} className="text-green-400" />
+                <Play size={12} className="text-[var(--success)]" />
                 Run
               </>
             )}
@@ -374,11 +365,11 @@ export default function ProblemSolver() {
           <button
             onClick={handleSubmit}
             disabled={submitting || running}
-            className="flex items-center gap-1.5 bg-white hover:bg-gray-100 disabled:opacity-40 text-black font-semibold px-3 py-1.5 rounded-lg text-xs transition-colors"
+            className="flex items-center gap-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-40 text-white font-semibold px-3 py-1.5 rounded-[var(--radius-md)] text-xs transition-all duration-150"
           >
             {submitting ? (
               <>
-                <div className="w-3 h-3 border border-black border-t-transparent rounded-full animate-spin" />
+                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
                 Submitting
               </>
             ) : (
@@ -396,15 +387,15 @@ export default function ProblemSolver() {
         {/* LEFT — Problem description */}
         <div
           style={{ width: `${leftWidth}%` }}
-          className="flex flex-col border-r border-[#1a1a1a] overflow-hidden flex-shrink-0"
+          className="flex flex-col border-r border-[var(--border-subtle)] overflow-hidden flex-shrink-0 bg-[var(--bg-base)]"
         >
           {/* Left tabs */}
-          <div className="flex border-b border-[#1a1a1a] bg-[#0a0a0a] flex-shrink-0">
+          <div className="flex border-b border-[var(--border-subtle)] flex-shrink-0">
             {(["description", "hints", "submissions"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setLeftTab(t)}
-                className={`px-4 py-2.5 text-xs font-medium capitalize transition-colors border-b-2 ${leftTab === t ? "text-white border-white" : "text-[#555555] border-transparent hover:text-[#888888]"}`}
+                className={`px-4 py-2.5 text-sm font-medium capitalize transition-colors duration-150 border-b-2 ${leftTab === t ? "text-[var(--text-primary)] border-[var(--accent)]" : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-secondary)]"}`}
               >
                 {t}
               </button>
@@ -416,47 +407,42 @@ export default function ProblemSolver() {
               <div className="p-5 space-y-5">
                 {/* Difficulty + topics */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-full ${diffBg(problem.difficulty)} capitalize`}
-                  >
+                  <span className={`badge capitalize ${diffBg(problem.difficulty)}`}>
                     {problem.difficulty}
                   </span>
                   {problem.topics?.map((t) => (
-                    <span
-                      key={t}
-                      className="text-xs bg-[#1a1a1a] text-[#666666] px-2.5 py-1 rounded-full"
-                    >
+                    <span key={t} className="badge badge-topic">
                       {t}
                     </span>
                   ))}
                 </div>
 
                 {/* Description */}
-                <div className="text-sm text-[#cccccc] leading-7 whitespace-pre-wrap">
+                <div className="text-sm text-[var(--text-secondary)] leading-7 whitespace-pre-wrap">
                   {problem.description}
                 </div>
 
                 {/* Examples */}
                 {problem.examples?.map((ex, i) => (
                   <div key={i}>
-                    <p className="text-sm font-bold text-white mb-2">
+                    <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">
                       Example {i + 1}:
                     </p>
-                    <div className="bg-[#111111] rounded-lg p-4 font-mono text-sm space-y-1 border-l-2 border-[#2a2a2a]">
+                    <div className="bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-4 font-mono text-sm space-y-1 border-l-2 border-[var(--border-strong)]">
                       <div>
-                        <span className="text-white font-bold">Input: </span>
-                        <span className="text-[#cccccc]">{ex.input}</span>
+                        <span className="text-[var(--text-primary)] font-semibold">Input: </span>
+                        <span className="text-[var(--text-secondary)]">{ex.input}</span>
                       </div>
                       <div>
-                        <span className="text-white font-bold">Output: </span>
-                        <span className="text-[#cccccc]">{ex.output}</span>
+                        <span className="text-[var(--text-primary)] font-semibold">Output: </span>
+                        <span className="text-[var(--text-secondary)]">{ex.output}</span>
                       </div>
                       {ex.explanation && (
                         <div className="pt-1">
-                          <span className="text-white font-bold">
+                          <span className="text-[var(--text-primary)] font-semibold">
                             Explanation:{" "}
                           </span>
-                          <span className="text-[#888888]">
+                          <span className="text-[var(--text-muted)]">
                             {ex.explanation}
                           </span>
                         </div>
@@ -468,14 +454,14 @@ export default function ProblemSolver() {
                 {/* Constraints */}
                 {problem.constraints && (
                   <div>
-                    <p className="text-sm font-bold text-white mb-2">
+                    <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">
                       Constraints:
                     </p>
-                    <div className="bg-[#111111] rounded-lg p-4">
+                    <div className="bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3">
                       {problem.constraints.split("\n").map((c, i) => (
                         <div
                           key={i}
-                          className="text-sm text-[#cccccc] font-mono"
+                          className="text-xs text-[var(--text-secondary)] font-mono"
                         >
                           {c}
                         </div>
@@ -485,10 +471,10 @@ export default function ProblemSolver() {
                 )}
 
                 {/* Companies — collapsible */}
-                <div className="border border-[#1a1a1a] rounded-lg overflow-hidden">
+                <div className="border border-[var(--border-subtle)] rounded-[var(--radius-md)] overflow-hidden">
                   <button
                     onClick={() => setCompaniesOpen((o) => !o)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-sm text-amber-400 hover:bg-[#111111] transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm text-[var(--warning)] hover:bg-[var(--bg-elevated)] transition-colors duration-150"
                   >
                     <span className="flex items-center gap-2 font-medium">
                       {" "}
@@ -503,10 +489,7 @@ export default function ProblemSolver() {
                   {companiesOpen && (
                     <div className="px-4 pb-4 flex flex-wrap gap-1.5">
                       {problem.companies?.map((c) => (
-                        <span
-                          key={c}
-                          className="text-xs bg-[#1a1a1a] text-[#666666] px-2.5 py-1 rounded-full"
-                        >
+                        <span key={c} className="badge badge-topic">
                           {c}
                         </span>
                       ))}
@@ -523,7 +506,7 @@ export default function ProblemSolver() {
                     <HintItem key={i} hint={h} index={i} />
                   ))
                 ) : (
-                  <div className="p-8 text-center text-[#444444] text-sm">
+                  <div className="p-8 text-center text-[var(--text-muted)] text-sm">
                     No hints available
                   </div>
                 )}
@@ -531,7 +514,7 @@ export default function ProblemSolver() {
             )}
 
             {leftTab === "submissions" && (
-              <div className="p-8 text-center text-[#444444] text-sm">
+              <div className="p-8 text-center text-[var(--text-muted)] text-sm">
                 {status
                   ? "Submit your solution to see it here"
                   : "No submissions yet"}
@@ -543,59 +526,66 @@ export default function ProblemSolver() {
         {/* Drag handle */}
         <div
           onMouseDown={handleMouseDown}
-          className="w-1 bg-[#1a1a1a] hover:bg-indigo-500/50 cursor-col-resize transition-colors flex-shrink-0"
+          className="w-1 bg-[var(--border-subtle)] hover:bg-[var(--accent)] cursor-col-resize transition-colors duration-150 flex-shrink-0"
         />
 
         {/* RIGHT — Editor + Test cases */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Editor info bar */}
-          <div className="flex items-center justify-between px-4 py-1.5 bg-[#0a0a0a] border-b border-[#1a1a1a] flex-shrink-0">
-            <span className="text-xs text-[#444444]">
-              Read input from stdin · Print output to stdout
-            </span>
-            <button
-              onClick={() => setCode(getDefaultCode(language, problem))}
-              className="flex items-center gap-1 text-xs text-[#555555] hover:text-white transition-colors"
-            >
-              <RotateCcw size={11} /> Reset
-            </button>
-          </div>
+          {/* Editor + info bar — forced dark regardless of theme */}
+          <div
+            data-theme="dark"
+            style={{ colorScheme: "dark" }}
+            className="no-transition flex-1 flex flex-col overflow-hidden bg-[var(--bg-code)] min-h-0"
+          >
+            {/* Editor info bar */}
+            <div className="flex items-center justify-between px-4 py-1.5 bg-[var(--bg-code)] border-b border-[var(--border-subtle)] flex-shrink-0">
+              <span className="text-xs text-[var(--text-muted)]">
+                Read input from stdin · Print output to stdout
+              </span>
+              <button
+                onClick={() => setCode(getDefaultCode(language, problem))}
+                className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150"
+              >
+                <RotateCcw size={11} /> Reset
+              </button>
+            </div>
 
-          {/* Monaco Editor */}
-          <div className="flex-1 overflow-hidden">
-            <Editor
-              height="100%"
-              language={language === "cpp" ? "cpp" : language}
-              value={code}
-              onChange={(val) => setCode(val || "")}
-              theme="vs-dark"
-              options={{
-                fontSize: 13,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                lineNumbers: "on",
-                renderLineHighlight: "line",
-                padding: { top: 10 },
-                fontFamily: "JetBrains Mono, Fira Code, Consolas, monospace",
-                tabSize: 4,
-                automaticLayout: true,
-              }}
-            />
+            {/* Monaco Editor */}
+            <div className="flex-1 overflow-hidden">
+              <Editor
+                height="100%"
+                language={language === "cpp" ? "cpp" : language}
+                value={code}
+                onChange={(val) => setCode(val || "")}
+                theme="vs-dark"
+                options={{
+                  fontSize: 13,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  lineNumbers: "on",
+                  renderLineHighlight: "line",
+                  padding: { top: 10 },
+                  fontFamily: "JetBrains Mono, Fira Code, Consolas, monospace",
+                  tabSize: 4,
+                  automaticLayout: true,
+                }}
+              />
+            </div>
           </div>
 
           {/* Bottom panel — Testcase / Result */}
-          <div className="h-56 border-t border-[#1a1a1a] bg-[#0a0a0a] flex flex-col flex-shrink-0">
+          <div className="h-56 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex flex-col flex-shrink-0">
             {/* Bottom tabs */}
-            <div className="flex items-center border-b border-[#1a1a1a] flex-shrink-0">
+            <div className="flex items-center border-b border-[var(--border-subtle)] flex-shrink-0">
               <button
                 onClick={() => setBottomTab("testcase")}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${bottomTab === "testcase" ? "text-white border-white" : "text-[#555555] border-transparent hover:text-[#888888]"}`}
+                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors duration-150 ${bottomTab === "testcase" ? "text-[var(--text-primary)] border-[var(--accent)]" : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-secondary)]"}`}
               >
                 <CheckCircle size={12} /> Testcase
               </button>
               <button
                 onClick={() => setBottomTab("result")}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${bottomTab === "result" ? "text-white border-white" : "text-[#555555] border-transparent hover:text-[#888888]"}`}
+                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors duration-150 ${bottomTab === "result" ? "text-[var(--text-primary)] border-[var(--accent)]" : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-secondary)]"}`}
               >
                 <Play size={12} /> Test Result
               </button>
@@ -604,16 +594,16 @@ export default function ProblemSolver() {
               {status && status !== "run" && (
                 <div className="ml-auto flex items-center gap-3 pr-4">
                   {aiFeedback && (
-                    <div className="flex bg-[#111111] rounded-lg p-0.5">
+                    <div className="flex bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-0.5">
                       <button
                         onClick={() => setResultSubTab("results")}
-                        className={`px-3 py-1 text-xs rounded-md transition-colors ${resultSubTab === "results" ? "bg-white text-black font-medium" : "text-[#555555]"}`}
+                        className={`px-3 py-1 text-xs rounded-[var(--radius-sm)] transition-colors duration-150 ${resultSubTab === "results" ? "bg-[var(--accent)] text-white font-medium" : "text-[var(--text-muted)]"}`}
                       >
                         Results
                       </button>
                       <button
                         onClick={() => setResultSubTab("ai")}
-                        className={`flex items-center gap-1 px-3 py-1 text-xs rounded-md transition-colors ${resultSubTab === "ai" ? "bg-white text-black font-medium" : "text-[#555555]"}`}
+                        className={`flex items-center gap-1 px-3 py-1 text-xs rounded-[var(--radius-sm)] transition-colors duration-150 ${resultSubTab === "ai" ? "bg-[var(--accent)] text-white font-medium" : "text-[var(--text-muted)]"}`}
                       >
                         <Brain size={11} /> AI Analysis
                       </button>
@@ -627,22 +617,22 @@ export default function ProblemSolver() {
               {bottomTab === "testcase" && (
                 <div className="space-y-3">
                   {problem?.test_cases?.slice(0, 2).map((tc, i) => (
-                    <div key={i} className="bg-[#111111] rounded-lg p-3">
-                      <p className="text-xs text-[#555555] mb-2">
+                    <div key={i} className="bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-3 border border-[var(--border-subtle)]">
+                      <p className="text-xs text-[var(--text-muted)] mb-2">
                         Case {i + 1}
                       </p>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <p className="text-xs text-[#444444] mb-1">Input</p>
-                          <code className="text-xs text-white font-mono bg-black/40 px-2 py-1 rounded block whitespace-pre">
+                          <p className="text-xs text-[var(--text-muted)] mb-1">Input</p>
+                          <code className="text-xs text-[var(--text-primary)] font-mono bg-black/40 px-2 py-1 rounded block whitespace-pre">
                             {tc.input}
                           </code>
                         </div>
                         <div>
-                          <p className="text-xs text-[#444444] mb-1">
+                          <p className="text-xs text-[var(--text-muted)] mb-1">
                             Expected Output
                           </p>
-                          <code className="text-xs text-green-400 font-mono bg-black/40 px-2 py-1 rounded block">
+                          <code className="text-xs text-[var(--success)] font-mono bg-black/40 px-2 py-1 rounded block">
                             {tc.expected_output}
                           </code>
                         </div>
@@ -655,15 +645,15 @@ export default function ProblemSolver() {
               {bottomTab === "result" && (
                 <>
                   {!status && !running && (
-                    <div className="flex items-center justify-center h-full text-[#444444] text-sm">
+                    <div className="flex items-center justify-center h-full text-[var(--text-muted)] text-sm">
                       You must run your code first
                     </div>
                   )}
 
                   {(running || submitting) && (
                     <div className="flex items-center justify-center h-full gap-3">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span className="text-[#555555] text-sm">
+                      <div className="w-5 h-5 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                      <span className="text-[var(--text-muted)] text-sm">
                         {running
                           ? "Running test cases..."
                           : "Submitting solution..."}
@@ -676,23 +666,23 @@ export default function ProblemSolver() {
                       {/* Overall status */}
                       <div className="flex items-center gap-3">
                         {status === "run" ? (
-                          <span className="text-blue-400 font-bold">
+                          <span className="text-[var(--info)] font-semibold">
                             Run Complete
                           </span>
                         ) : status === "accepted" ? (
-                          <span className="text-green-400 font-bold text-lg">
+                          <span className="text-[var(--success)] font-semibold text-lg">
                             ✓ Accepted
                           </span>
                         ) : status === "wrong_answer" ? (
-                          <span className="text-red-400 font-bold text-lg">
+                          <span className="text-[var(--danger)] font-semibold text-lg">
                             ✗ Wrong Answer
                           </span>
                         ) : (
-                          <span className="text-amber-400 font-bold">
+                          <span className="text-[var(--warning)] font-semibold">
                             Runtime Error
                           </span>
                         )}
-                        <span className="text-xs text-[#444444]">
+                        <span className="text-xs text-[var(--text-muted)]">
                           {passedCount}/{results.length} testcases passed
                         </span>
                       </div>
@@ -701,40 +691,40 @@ export default function ProblemSolver() {
                       {results.map((r, i) => (
                         <div
                           key={i}
-                          className={`rounded-lg p-3 border ${r.passed ? "border-green-500/20 bg-green-500/5" : "border-red-500/20 bg-red-500/5"}`}
+                          className={`rounded-[var(--radius-md)] p-3 border ${r.passed ? "border-[var(--success-border)] bg-[var(--success-dim)]" : "border-[var(--danger-border)] bg-[var(--danger-dim)]"}`}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             {r.passed ? (
                               <CheckCircle
                                 size={13}
-                                className="text-green-400"
+                                className="text-[var(--success)]"
                               />
                             ) : (
-                              <XCircle size={13} className="text-red-400" />
+                              <XCircle size={13} className="text-[var(--danger)]" />
                             )}
                             <span
-                              className={`text-xs font-medium ${r.passed ? "text-green-400" : "text-red-400"}`}
+                              className={`text-xs font-medium ${r.passed ? "text-[var(--success)]" : "text-[var(--danger)]"}`}
                             >
                               Case {i + 1} — {r.passed ? "Passed" : "Failed"}
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-2 text-xs font-mono">
                             <div>
-                              <p className="text-[#444444] mb-0.5">Input</p>
-                              <code className="text-white bg-black/30 px-2 py-1 rounded block whitespace-pre">
+                              <p className="text-[var(--text-muted)] mb-0.5">Input</p>
+                              <code className="text-[var(--text-primary)] bg-black/30 px-2 py-1 rounded block whitespace-pre">
                                 {r.input}
                               </code>
                             </div>
                             <div>
-                              <p className="text-[#444444] mb-0.5">Expected</p>
-                              <code className="text-green-400 bg-black/30 px-2 py-1 rounded block">
+                              <p className="text-[var(--text-muted)] mb-0.5">Expected</p>
+                              <code className="text-[var(--success)] bg-black/30 px-2 py-1 rounded block">
                                 {r.expected}
                               </code>
                             </div>
                             <div>
-                              <p className="text-[#444444] mb-0.5">Output</p>
+                              <p className="text-[var(--text-muted)] mb-0.5">Output</p>
                               <code
-                                className={`bg-black/30 px-2 py-1 rounded block ${r.passed ? "text-green-400" : "text-red-400"}`}
+                                className={`bg-black/30 px-2 py-1 rounded block ${r.passed ? "text-[var(--success)]" : "text-[var(--danger)]"}`}
                               >
                                 {r.actual || r.stderr || "No output"}
                               </code>
@@ -748,58 +738,58 @@ export default function ProblemSolver() {
                   {status && aiFeedback && resultSubTab === "ai" && (
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#111111] rounded-lg p-3">
-                          <p className="text-xs text-[#444444] mb-1">
+                        <div className="bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-3">
+                          <p className="text-xs text-[var(--text-muted)] mb-1">
                             Time Complexity
                           </p>
-                          <p className="text-sm font-bold text-indigo-400 font-mono">
+                          <p className="text-sm font-semibold text-[var(--accent)] font-mono">
                             {aiFeedback.timeComplexity}
                           </p>
                         </div>
-                        <div className="bg-[#111111] rounded-lg p-3">
-                          <p className="text-xs text-[#444444] mb-1">
+                        <div className="bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-3">
+                          <p className="text-xs text-[var(--text-muted)] mb-1">
                             Space Complexity
                           </p>
-                          <p className="text-sm font-bold text-teal-400 font-mono">
+                          <p className="text-sm font-semibold text-[var(--teal)] font-mono">
                             {aiFeedback.spaceComplexity}
                           </p>
                         </div>
                       </div>
-                      <div className="bg-[#111111] rounded-lg p-3">
-                        <p className="text-xs text-[#444444] mb-1">
+                      <div className="bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-3">
+                        <p className="text-xs text-[var(--text-muted)] mb-1">
                           Your Approach
                         </p>
-                        <p className="text-xs text-[#cccccc]">
+                        <p className="text-xs text-[var(--text-secondary)]">
                           {aiFeedback.approach}
                         </p>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#111111] rounded-lg p-3">
-                          <p className="text-xs text-green-400 font-medium mb-2">
+                        <div className="bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-3">
+                          <p className="text-xs text-[var(--success)] font-medium mb-2">
                             ✓ Strengths
                           </p>
                           {aiFeedback.strengths?.map((s, i) => (
-                            <p key={i} className="text-xs text-[#888888] mb-1">
+                            <p key={i} className="text-xs text-[var(--text-secondary)] mb-1">
                               • {s}
                             </p>
                           ))}
                         </div>
-                        <div className="bg-[#111111] rounded-lg p-3">
-                          <p className="text-xs text-amber-400 font-medium mb-2">
+                        <div className="bg-[var(--bg-overlay)] rounded-[var(--radius-md)] p-3">
+                          <p className="text-xs text-[var(--warning)] font-medium mb-2">
                             ↑ Improvements
                           </p>
                           {aiFeedback.improvements?.map((s, i) => (
-                            <p key={i} className="text-xs text-[#888888] mb-1">
+                            <p key={i} className="text-xs text-[var(--text-secondary)] mb-1">
                               • {s}
                             </p>
                           ))}
                         </div>
                       </div>
-                      <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3">
-                        <p className="text-xs text-indigo-400 font-medium mb-1">
+                      <div className="bg-[var(--accent-dim)] border border-[var(--accent-border)] rounded-[var(--radius-md)] p-3">
+                        <p className="text-xs text-[var(--accent)] font-medium mb-1">
                           Optimal Approach ({aiFeedback.optimalComplexity})
                         </p>
-                        <p className="text-xs text-[#cccccc]">
+                        <p className="text-xs text-[var(--text-secondary)]">
                           {aiFeedback.optimalApproach}
                         </p>
                       </div>

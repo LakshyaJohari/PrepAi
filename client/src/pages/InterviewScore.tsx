@@ -136,44 +136,44 @@ export default function InterviewScore() {
     : 0;
 
   const scoreColor = (s: number) =>
-    s >= 80 ? "text-green-400" : s >= 60 ? "text-amber-400" : "text-red-400";
+    s >= 80 ? "text-[var(--success)]" : s >= 60 ? "text-[var(--warning)]" : "text-[var(--danger)]";
 
   const barColor = (s: number) =>
-    s >= 8 ? "bg-green-400" : s >= 5 ? "bg-amber-400" : "bg-red-400";
+    s >= 8 ? "bg-[var(--success)]" : s >= 5 ? "bg-[var(--warning)]" : "bg-[var(--danger)]";
 
   const verdictColor = (v: string) =>
     ({
-      strong: "text-green-400",
-      good: "text-teal-400",
-      needs_work: "text-amber-400",
-      poor: "text-red-400",
-    })[v] || "text-[#555555]";
+      strong: "text-[var(--success)]",
+      good: "text-[var(--teal)]",
+      needs_work: "text-[var(--warning)]",
+      poor: "text-[var(--danger)]",
+    })[v] || "text-[var(--text-muted)]";
 
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-[#555555] text-sm">Scoring your answers...</p>
+          <div className="w-10 h-10 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-[var(--text-muted)] text-sm">Scoring your answers...</p>
         </div>
       </div>
     );
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-6 flex items-center justify-between">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">Interview Report</h1>
-          <p className="text-sm text-[#555555] mt-1">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Interview Report</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">
             {company} · {role} · {roundType?.replace("_", " ")}
           </p>
         </div>
         <div className="text-center">
-          <div className={`text-6xl font-black ${scoreColor(avgScore)}`}>
+          <div className={`text-5xl font-bold ${scoreColor(avgScore)}`}>
             {avgScore}
           </div>
-          <div className="text-xs text-[#444444] mt-1">Overall Score</div>
+          <div className="text-xs text-[var(--text-muted)] mt-1">Overall Score</div>
         </div>
       </div>
 
@@ -182,23 +182,23 @@ export default function InterviewScore() {
         {scores.map((s, i) => (
           <div
             key={i}
-            className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-xl overflow-hidden"
+            className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden"
           >
             <button
               onClick={() => setExpanded(expanded === i ? null : i)}
-              className="w-full p-4 flex items-center justify-between text-left hover:bg-white/[0.02] transition-colors"
+              className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-[var(--bg-elevated)] transition-colors duration-150"
             >
               <div className="flex items-center gap-3">
-                <span className="text-xs font-medium text-[#444444]">
+                <span className="text-xs font-medium text-[var(--text-muted)]">
                   Q{i + 1}
                 </span>
-                <span className="text-sm text-white font-medium line-clamp-1">
+                <span className="text-sm text-[var(--text-primary)] font-medium line-clamp-1">
                   {s.question}
                 </span>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
                 <span
-                  className={`text-sm font-black ${scoreColor(s.feedback.overallScore)}`}
+                  className={`text-sm font-bold ${scoreColor(s.feedback.overallScore)}`}
                 >
                   {s.feedback.overallScore}/100
                 </span>
@@ -211,33 +211,33 @@ export default function InterviewScore() {
             </button>
 
             {expanded === i && (
-              <div className="px-4 pb-4 space-y-4 border-t border-[#1a1a1a] pt-4">
+              <div className="px-4 pb-4 space-y-4 border-t border-[var(--border-subtle)] pt-4">
                 <div>
-                  <p className="text-xs font-medium text-[#444444] uppercase tracking-widest mb-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] mb-1">
                     Your Answer
                   </p>
-                  <p className="text-sm text-[#888888] bg-[#1a1a1a] rounded-lg p-3">
+                  <p className="text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3">
                     {s.answer}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-[#444444] uppercase tracking-widest mb-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] mb-2">
                     STAR Breakdown
                   </p>
                   <div className="space-y-2">
                     {Object.entries(s.feedback.star).map(([key, val]) => (
                       <div key={key} className="flex items-center gap-3">
-                        <span className="text-xs text-[#555555] w-16 capitalize">
+                        <span className="text-xs text-[var(--text-muted)] w-16 capitalize">
                           {key}
                         </span>
-                        <div className="flex-1 h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
                           <div
                             className={`h-full ${barColor(val)} rounded-full`}
                             style={{ width: `${val * 10}%` }}
                           />
                         </div>
-                        <span className="text-xs font-medium text-white w-8">
+                        <span className="text-xs font-medium text-[var(--text-primary)] w-8">
                           {val}/10
                         </span>
                       </div>
@@ -246,17 +246,17 @@ export default function InterviewScore() {
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-[#444444] uppercase tracking-widest mb-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] mb-2">
                     Parameters
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(s.feedback.parameters).map(([key, val]) => (
-                      <div key={key} className="bg-[#1a1a1a] rounded-lg p-2.5">
-                        <div className="text-xs text-[#555555] capitalize">
+                      <div key={key} className="bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3">
+                        <div className="text-xs text-[var(--text-muted)] capitalize">
                           {key.replace(/([A-Z])/g, " $1")}
                         </div>
                         <div
-                          className={`text-lg font-black ${scoreColor(val * 10)}`}
+                          className={`text-lg font-bold ${scoreColor(val * 10)}`}
                         >
                           {val}/10
                         </div>
@@ -267,32 +267,32 @@ export default function InterviewScore() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs font-medium text-green-400 mb-2 flex items-center gap-1">
+                    <p className="text-xs font-medium text-[var(--success)] mb-2 flex items-center gap-1">
                       <CheckCircle size={12} /> Strengths
                     </p>
                     <ul className="space-y-1">
                       {s.feedback.strengths?.map((str, j) => (
                         <li
                           key={j}
-                          className="text-xs text-[#666666] flex items-start gap-1.5"
+                          className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5"
                         >
-                          <span className="text-green-400 mt-0.5">•</span>
+                          <span className="text-[var(--success)] mt-0.5">•</span>
                           {str}
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-red-400 mb-2 flex items-center gap-1">
+                    <p className="text-xs font-medium text-[var(--danger)] mb-2 flex items-center gap-1">
                       <XCircle size={12} /> Weaknesses
                     </p>
                     <ul className="space-y-1">
                       {s.feedback.weaknesses?.map((w, j) => (
                         <li
                           key={j}
-                          className="text-xs text-[#666666] flex items-start gap-1.5"
+                          className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5"
                         >
-                          <span className="text-red-400 mt-0.5">•</span>
+                          <span className="text-[var(--danger)] mt-0.5">•</span>
                           {w}
                         </li>
                       ))}
@@ -301,18 +301,18 @@ export default function InterviewScore() {
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-amber-400 mb-2 flex items-center gap-1">
+                  <p className="text-xs font-medium text-[var(--warning)] mb-2 flex items-center gap-1">
                     <AlertCircle size={12} /> How to Improve
                   </p>
                   <ul className="space-y-1">
                     {s.feedback.improvements?.map((imp, j) => (
                       <li
                         key={j}
-                        className="text-xs text-[#666666] flex items-start gap-1.5"
+                        className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5"
                       >
                         <TrendingUp
                           size={10}
-                          className="text-amber-400 mt-0.5 flex-shrink-0"
+                          className="text-[var(--warning)] mt-0.5 flex-shrink-0"
                         />
                         {imp}
                       </li>
@@ -320,11 +320,11 @@ export default function InterviewScore() {
                   </ul>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                  <p className="text-xs font-medium text-white mb-1">
+                <div className="bg-[var(--accent-dim)] border border-[var(--accent-border)] rounded-[var(--radius-md)] p-3">
+                  <p className="text-xs font-semibold text-[var(--accent)] mb-1">
                     Ideal Answer
                   </p>
-                  <p className="text-xs text-[#666666]">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     {s.feedback.idealAnswer}
                   </p>
                 </div>
@@ -338,19 +338,19 @@ export default function InterviewScore() {
       <div className="flex gap-3">
         <button
           onClick={() => navigate("/interview/new")}
-          className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-all duration-150"
         >
           <RotateCcw size={14} /> Try Again
         </button>
         <button
           onClick={() => navigate("/history")}
-          className="px-5 py-2.5 rounded-xl text-sm text-[#888888] border border-[#1a1a1a] hover:border-[#333333] hover:text-white transition-colors"
+          className="px-4 py-2 rounded-[var(--radius-md)] text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] hover:bg-[var(--border-default)] border border-[var(--border-default)] hover:text-[var(--text-primary)] transition-all duration-150"
         >
           View History
         </button>
         <button
           onClick={() => navigate("/dashboard")}
-          className="px-5 py-2.5 rounded-xl text-sm text-[#888888] border border-[#1a1a1a] hover:border-[#333333] hover:text-white transition-colors"
+          className="px-4 py-2 rounded-[var(--radius-md)] text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] hover:bg-[var(--border-default)] border border-[var(--border-default)] hover:text-[var(--text-primary)] transition-all duration-150"
         >
           Dashboard
         </button>

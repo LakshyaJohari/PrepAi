@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts'
 import { TrendingUp, Award, Target, Zap } from 'lucide-react'
+import { getChartColors, getTooltipStyle } from '../lib/chartConfig'
 
 interface Session {
   overall_score: number | null
@@ -75,102 +76,101 @@ export default function Analytics() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
+  const chartColors = getChartColors()
+  const tooltipStyle = getTooltipStyle()
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-black text-white">Analytics</h1>
-        <p className="text-[#666666] text-sm mt-1">Track your interview performance over time</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Analytics</h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">Track your interview performance over time</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Total Sessions', value: sessions.length, icon: Target, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-          { label: 'Avg Score', value: avgScore || '—', icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { label: 'Best Score', value: bestScore || '—', icon: Award, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-          { label: 'Questions Done', value: turns.length, icon: Zap, color: 'text-teal-400', bg: 'bg-teal-400/10' },
-        ].map(({ label, value, icon: Icon, color, bg }) => (
-          <div key={label} className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5 hover:border-[#333333] transition-colors">
-            <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center mb-4`}>
-              <Icon size={18} className={color} />
+          { label: 'Total Sessions', value: sessions.length, icon: Target },
+          { label: 'Avg Score', value: avgScore || '—', icon: TrendingUp },
+          { label: 'Best Score', value: bestScore || '—', icon: Award },
+          { label: 'Questions Done', value: turns.length, icon: Zap },
+        ].map(({ label, value, icon: Icon }) => (
+          <div key={label} className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 hover:border-[var(--border-strong)] transition-colors duration-150">
+            <div className="w-8 h-8 bg-[var(--accent-dim)] rounded-[var(--radius-md)] flex items-center justify-center mb-3">
+              <Icon size={16} className="text-[var(--accent)]" />
             </div>
-            <div className="text-2xl font-black text-white">{value}</div>
-            <div className="text-xs text-[#555555] mt-0.5">{label}</div>
+            <div className="text-2xl font-bold text-[var(--text-primary)]">{value}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">{label}</div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         {/* Score over time */}
-        <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-          <h2 className="text-sm font-medium text-[#888888] mb-4">Score Over Time</h2>
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+          <h2 className="text-sm font-medium text-[var(--text-secondary)] mb-4">Score Over Time</h2>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#555555' }} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#555555' }} />
-                <Tooltip
-                  contentStyle={{ background: '#0D0D0D', border: '1px solid #222222', borderRadius: 8 }}
-                  labelStyle={{ color: '#ffffff' }}
-                  itemStyle={{ color: '#888888' }}
-                />
-                <Line type="monotone" dataKey="score" stroke="#ffffff" strokeWidth={2} dot={{ fill: '#ffffff', r: 3 }} />
+                <CartesianGrid strokeDasharray="2 2" stroke={chartColors.grid} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: chartColors.text }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: chartColors.text }} />
+                <Tooltip {...tooltipStyle} />
+                <Line type="monotone" dataKey="score" stroke={chartColors.primary} strokeWidth={2} dot={{ fill: chartColors.primary, r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-48 flex items-center justify-center text-[#333333] text-sm">No data yet</div>
+            <div className="h-48 flex items-center justify-center text-[var(--text-disabled)] text-sm">No data yet</div>
           )}
         </div>
 
         {/* STAR radar */}
-        <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl p-5">
-          <h2 className="text-sm font-medium text-[#888888] mb-4">STAR Analysis</h2>
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5">
+          <h2 className="text-sm font-medium text-[var(--text-secondary)] mb-4">STAR Analysis</h2>
           {radarData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="#1a1a1a" />
-                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: '#555555' }} />
-                <Radar dataKey="value" stroke="#ffffff" fill="#ffffff" fillOpacity={0.1} />
+                <PolarGrid stroke={chartColors.grid} />
+                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: chartColors.text }} />
+                <Radar dataKey="value" stroke={chartColors.primary} fill={chartColors.primary} fillOpacity={0.15} />
               </RadarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-48 flex items-center justify-center text-[#333333] text-sm">No data yet</div>
+            <div className="h-48 flex items-center justify-center text-[var(--text-disabled)] text-sm">No data yet</div>
           )}
         </div>
       </div>
 
       {/* Sessions table */}
-      <div className="bg-[#0D0D0D] border border-[#1a1a1a] rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-[#1a1a1a]">
-          <h2 className="text-sm font-medium text-[#888888]">All Sessions</h2>
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden">
+        <div className="p-4 border-b border-[var(--border-subtle)]">
+          <h2 className="text-sm font-medium text-[var(--text-secondary)]">All Sessions</h2>
         </div>
         {sessions.length === 0 ? (
-          <div className="p-8 text-center text-[#444444] text-sm">No sessions yet</div>
+          <div className="p-8 text-center text-[var(--text-muted)] text-sm">No sessions yet</div>
         ) : (
           <table className="w-full">
-            <thead className="bg-[#111111]">
+            <thead className="bg-[var(--bg-elevated)]">
               <tr>
                 {['Company', 'Round', 'Score', 'Date'].map(h => (
-                  <th key={h} className="text-left text-xs font-medium text-[#444444] px-4 py-3 uppercase tracking-widest">{h}</th>
+                  <th key={h} className="text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)] px-4 py-3">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1a1a1a]">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {sessions.map((s, i) => (
-                <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="px-4 py-3 text-sm text-white">{s.company}</td>
-                  <td className="px-4 py-3 text-sm text-[#555555] capitalize">{s.round_type?.replace('_', ' ')}</td>
-                  <td className="px-4 py-3 text-sm font-black">
-                    <span className={s.overall_score && s.overall_score >= 80 ? 'text-green-400' : s.overall_score && s.overall_score >= 60 ? 'text-amber-400' : 'text-red-400'}>
+                <tr key={i} className="hover:bg-[var(--bg-elevated)] transition-colors duration-150">
+                  <td className="px-4 py-3 text-sm text-[var(--text-primary)]">{s.company}</td>
+                  <td className="px-4 py-3 text-sm text-[var(--text-muted)] capitalize">{s.round_type?.replace('_', ' ')}</td>
+                  <td className="px-4 py-3 text-sm font-bold">
+                    <span className={s.overall_score && s.overall_score >= 80 ? 'text-[var(--success)]' : s.overall_score && s.overall_score >= 60 ? 'text-[var(--warning)]' : 'text-[var(--danger)]'}>
                       {s.overall_score || '—'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#444444]">{new Date(s.created_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-sm text-[var(--text-muted)]">{new Date(s.created_at).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
