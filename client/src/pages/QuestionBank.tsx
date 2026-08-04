@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../lib/supabase'
+
 import { useAuthStore } from '../store/authStore'
 import { Bookmark, BookmarkCheck, Search } from 'lucide-react'
 
@@ -47,14 +47,7 @@ export default function QuestionBank() {
       setSaved(prev => prev.filter(s => s !== key))
     } else {
       setSaved(prev => [...prev, key])
-      await supabase.from('saved_questions').insert({
-        user_id: user?.id,
-        question: q.question,
-        company: q.company,
-        role: q.role,
-        type: q.type,
-        difficulty: q.difficulty,
-      })
+      // api.post('/problems/save', ...)
     }
   }
 

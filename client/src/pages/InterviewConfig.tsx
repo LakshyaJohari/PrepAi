@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../lib/api'
 import { Mic, Brain, Layout } from 'lucide-react'
 
 const companies = ['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft', 'Netflix', 'Flipkart', 'Swiggy', 'Zomato', 'Startup']
@@ -31,7 +31,7 @@ export default function InterviewConfig() {
     setLoading(true)
     try {
       const sessionId = crypto.randomUUID()
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/interview/start`, {
+      const res = await api.post(`/interview/start`, {
         sessionId, company, role, roundType, difficulty: difficulty.toLowerCase()
       })
       navigate('/interview/session', {

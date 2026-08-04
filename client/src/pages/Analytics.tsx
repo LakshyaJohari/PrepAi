@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import api from '../lib/api'
 import { useAuthStore } from '../store/authStore'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts'
 import { TrendingUp, Award, Target, Zap } from 'lucide-react'
@@ -24,16 +24,13 @@ export default function Analytics() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: s } = await supabase
-        .from('sessions')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: true })
-      const { data: t } = await supabase
-        .from('turns')
-        .select('ai_feedback, session_id')
-      setSessions(s || [])
-      setTurns(t || [])
+      try {
+        const { data } = await api.get('/user/analytics')
+        setSessions(data.sessions || [])
+        setTurns(data.turns || [])
+      } catch (err) {
+        console.error('Analytics fetch error:', err)
+      }
       setLoading(false)
     }
     if (user) fetchData()

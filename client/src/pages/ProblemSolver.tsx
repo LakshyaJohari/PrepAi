@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/api";
 import Editor from "@monaco-editor/react";
 import { useAuthStore } from "../store/authStore";
 import {
@@ -190,8 +190,9 @@ export default function ProblemSolver() {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/problems/${slug}`,
+        const res = await api.get(
+          `/problems/${slug}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('prepai-token')}` } }
         );
         setProblem(res.data.problem);
         setTimerActive(true);
@@ -228,9 +229,10 @@ export default function ProblemSolver() {
     setBottomTab("result");
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/problems/${problem.id}/run`,
+      const res = await api.post(
+        `/problems/${problem.id}/run`,
         { code, language, testCases: problem.test_cases.slice(0, 2) },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('prepai-token')}` } }
       );
       setResults(res.data.results || []);
       setStatus("run");

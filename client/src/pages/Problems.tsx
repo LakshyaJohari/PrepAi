@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../lib/api'
 import { Search, Filter } from 'lucide-react'
 
 interface Problem {
@@ -40,7 +40,7 @@ export default function Problems() {
       if (difficulty !== 'All') params.difficulty = difficulty
       if (search) params.search = search
 
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/problems`, { params })
+      const res = await api.get(`/problems`, { params })
       setProblems(res.data.problems || [])
       setPage(1)
     } catch (err) {

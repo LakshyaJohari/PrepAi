@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { supabase } from "./lib/supabase";
 import { useAuthStore } from "./store/authStore";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
@@ -8,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import InterviewConfig from "./pages/InterviewConfig";
 import InterviewSession from "./pages/InterviewSession";
 import InterviewScore from "./pages/InterviewScore";
+import InterviewResult from "./pages/InterviewResult";
 import Layout from "./components/layout/Layout";
 import Preparation from "./pages/Preparation";
 import History from "./pages/History";
@@ -21,41 +21,15 @@ import ContestRoom from "./pages/ContestRoom";
 import ContestSchedule from "./pages/ContestSchedule";
 
 function App() {
-  const { user, setUser } = useAuthStore();
+  const { user, loading, initAuth } = useAuthStore();
 
   useEffect(() => {
-  supabase.auth.getSession().then(async ({ data: { session } }) => {
-    if (session?.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', session.user.id)
-        .single()
-      setUser({ 
-        id: session.user.id, 
-        email: session.user.email!, 
-        name: profile?.username || session.user.email?.split('@')[0] || ''
-      })
-    } else setUser(null)
-  })
+    initAuth();
+  }, [initAuth]);
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (session?.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', session.user.id)
-        .single()
-      setUser({ 
-        id: session.user.id, 
-        email: session.user.email!, 
-        name: profile?.username || session.user.email?.split('@')[0] || ''
-      })
-    } else setUser(null)
-  })
-
-  return () => subscription.unsubscribe()
-}, [])
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center bg-background text-text">Loading...</div>;
+  }
 
   const wrap = (component: React.ReactElement) =>
     user ? <Layout>{component}</Layout> : <Navigate to="/login" />;
@@ -76,6 +50,7 @@ function App() {
         <Route path="/interview/new" element={wrap(<InterviewConfig />)} />
         <Route path="/interview/session" element={wrap(<InterviewSession />)} />
         <Route path="/interview/score" element={wrap(<InterviewScore />)} />
+        <Route path="/interview/result/:id" element={wrap(<InterviewResult />)} />
         <Route path="/preparation" element={wrap(<Preparation />)} />
         <Route path="/history" element={wrap(<History />)} />
         <Route path="/analytics" element={wrap(<Analytics />)} />

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import api from "../lib/api";
+import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import Logo from '../components/ui/Logo'
+import { useGoogleLogin } from '@react-oauth/google';
 
 
 
@@ -96,46 +98,55 @@ export default function Login() {
     document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
+  const { initAuth } = useAuthStore();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setMessage("");
 
-    if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) setError(error.message);
-      else navigate("/dashboard");
-    } else if (mode === "register") {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        setError(error.message);
-      } else if (data.user) {
-        await supabase
-          .from("profiles")
-          .insert({ id: data.user.id, email, name });
+    try {
+      if (mode === "login") {
+        const res = await api.post('/auth/login', { email, password });
+        localStorage.setItem('prepai-token', res.data.token);
+        await initAuth();
         navigate("/dashboard");
+      } else if (mode === "register") {
+        const res = await api.post('/auth/register', { email, password, username: name });
+        localStorage.setItem('prepai-token', res.data.token);
+        await initAuth();
+        navigate("/dashboard");
+      } else if (mode === "forgot") {
+        // Mock forgot password for now since custom auth doesn't have it implemented yet
+        setMessage("Password reset feature coming soon!");
       }
-    } else if (mode === "forgot") {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "http://localhost:5173/reset-password",
-      });
-      if (error) setError(error.message);
-      else setMessage("Password reset email sent! Check your inbox.");
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Authentication failed");
     }
 
     setLoading(false);
   };
 
-  const handleGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: "http://localhost:5173/dashboard" },
-    });
-  };
+  const handleGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await api.post('/auth/google', { access_token: tokenResponse.access_token });
+        localStorage.setItem('prepai-token', res.data.token);
+        await initAuth();
+        navigate("/dashboard");
+      } catch (err: any) {
+        setError(err.response?.data?.error || err.response?.data?.details || "Google authentication failed on server");
+        setLoading(false);
+      }
+    },
+    onError: (errorResponse) => {
+      setError("Google sign-in failed.");
+      console.error(errorResponse);
+    }
+  });
 
   const titles = {
     login: {
@@ -238,7 +249,7 @@ export default function Login() {
           {mode !== "forgot" && (
             <>
               <button
-                onClick={handleGoogle}
+                onClick={() => handleGoogle()}
                 className="w-full flex items-center justify-center gap-3 bg-[var(--bg-elevated)] hover:bg-[var(--bg-overlay)] border border-[var(--border-default)] text-[var(--text-primary)] font-medium rounded-[var(--radius-md)] py-2.5 text-sm transition-all duration-150 mb-4"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18">

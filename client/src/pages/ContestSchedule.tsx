@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../lib/api'
 import { useAuthStore } from '../store/authStore'
 import { Trophy, Calendar, Clock } from 'lucide-react'
 
@@ -19,7 +19,7 @@ export default function ContestSchedule() {
     setLoading(true)
     setError('')
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/contests/create`, {
+      await api.post('/contests/create', {
         title,
         description,
         startTime,

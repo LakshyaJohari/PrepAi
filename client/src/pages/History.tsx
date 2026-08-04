@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import api from '../lib/api'
 import { useAuthStore } from '../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import { Clock, Code } from 'lucide-react'
@@ -37,18 +37,30 @@ export default function History() {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return
-      const { data: s } = await supabase
-        .from('sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-      const { data: p } = await supabase
-        .from('problems')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('solved_at', { ascending: false })
-      setSessions(s || [])
-      setProblems(p || [])
+      try {
+        const { data } = await api.get('/user/history')
+        setSessions(data.interviews.map((i: any) => ({
+          id: i._id,
+          company: i.config?.company || 'Unknown',
+          role: i.config?.role || 'Unknown',
+          round_type: i.config?.roundType || 'General',
+          difficulty: i.config?.difficulty || 'Medium',
+          overall_score: i.score,
+          created_at: i.createdAt
+        })))
+        setProblems(data.submissions.map((s: any) => ({
+          id: s.id,
+          title: s.problem || 'Unknown Problem',
+          platform: 'PrepAI',
+          difficulty: s.difficulty || 'Medium',
+          topic: s.language || 'Code',
+          time_taken: null,
+          notes: s.status,
+          solved_at: s.created_at
+        })))
+      } catch (err) {
+        console.error('Failed to fetch history:', err)
+      }
       setLoading(false)
     }
     fetchData()

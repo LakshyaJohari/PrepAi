@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { supabase } from '../lib/supabase'
+import api from '../lib/api'
 import { useNavigate, Link } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -10,16 +11,19 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
+  const { setUser } = useAuthStore()
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if (error) {
-      setError(error.message)
-    } else if (data.user) {
-      await supabase.from('profiles').insert({ id: data.user.id, email, name })
+    try {
+      const res = await api.post('/auth/register', { email, password, name })
+      localStorage.setItem('prepai-token', res.data.token)
+      setUser(res.data.user)
       navigate('/dashboard')
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to register')
     }
     setLoading(false)
   }

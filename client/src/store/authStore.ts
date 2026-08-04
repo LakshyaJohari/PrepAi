@@ -1,10 +1,12 @@
 import { create } from 'zustand'
-import { supabase } from '../lib/supabase'
+import api from '../lib/api'
 
 interface User {
   id: string
   email: string
   name: string
+  streak?: number
+  isAdmin?: boolean
 }
 
 type Theme = 'dark' | 'light'
@@ -14,9 +16,11 @@ interface AuthStore {
   loading: boolean
   theme: Theme
   setUser: (user: User | null) => void
-  logout: () => Promise<void>
+  setLoading: (loading: boolean) => void
+  logout: () => void
   toggleTheme: () => void
   setTheme: (theme: Theme) => void
+  initAuth: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -24,8 +28,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   loading: true,
   theme: (localStorage.getItem('prepai-theme') as Theme) || 'dark',
   setUser: (user) => set({ user, loading: false }),
-  logout: async () => {
-    await supabase.auth.signOut()
+  setLoading: (loading) => set({ loading }),
+  logout: () => {
+    localStorage.removeItem('prepai-token')
     set({ user: null })
   },
   toggleTheme: () => {
@@ -39,4 +44,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     localStorage.setItem('prepai-theme', theme)
     set({ theme })
   },
+  initAuth: async () => {
+    const token = localStorage.getItem('prepai-token')
+    if (!token) {
+      set({ user: null, loading: false })
+      return
+    }
+
+    try {
+      const response = await api.get('/auth/me')
+      set({ user: response.data.user, loading: false })
+    } catch (err) {
+      console.error('Failed to init auth:', err)
+      localStorage.removeItem('prepai-token')
+      set({ user: null, loading: false })
+    }
+  }
 }))

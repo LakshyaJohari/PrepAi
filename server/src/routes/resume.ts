@@ -2,6 +2,7 @@ import { Router } from 'express'
 import multer from 'multer'
 import fs from 'fs'
 import { analyzeResume, generateResumeQuestions } from '../services/gemini'
+import { authenticate, AuthRequest } from '../middleware/auth'
 
 // @ts-ignore
 const PDFParser = require('pdf2json')
@@ -29,7 +30,7 @@ function parsePDF(filePath: string): Promise<string> {
   })
 }
 
-router.post('/upload', upload.single('resume'), async (req, res) => {
+router.post('/upload', authenticate, upload.single('resume'), async (req: AuthRequest, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
     const filePath = req.file.path
@@ -44,7 +45,7 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
   }
 })
 
-router.post('/analyze', async (req, res) => {
+router.post('/analyze', authenticate, async (req: AuthRequest, res) => {
   try {
     const { resumeText, targetRole, targetCompany } = req.body
     const analysis = await analyzeResume(resumeText, targetRole, targetCompany)
@@ -55,7 +56,7 @@ router.post('/analyze', async (req, res) => {
   }
 })
 
-router.post('/questions', async (req, res) => {
+router.post('/questions', authenticate, async (req: AuthRequest, res) => {
   try {
     const { resumeText, role, company } = req.body
     const result = await generateResumeQuestions(resumeText, role, company)

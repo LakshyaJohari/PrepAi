@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../lib/api'
 import { Trophy, Clock, ChevronRight, Plus } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
-import { supabase } from '../lib/supabase'
 
 interface Contest {
   id: string
@@ -62,11 +61,11 @@ export default function Contest() {
     const fetchData = async () => {
       // Sync statuses first
       try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/contests/sync`)
+        await api.post('/contests/sync')
       } catch {}
 
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/contests`)
+        const res = await api.get('/contests')
         setContests(res.data.contests || [])
       } catch {
         console.error('Failed to fetch contests')
@@ -74,12 +73,7 @@ export default function Contest() {
 
       // Check admin
       if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single()
-        setIsAdmin(data?.is_admin || false)
+        setIsAdmin(user.isAdmin || false)
       }
 
       setLoading(false)

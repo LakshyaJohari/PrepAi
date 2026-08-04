@@ -2,11 +2,15 @@ import dns from 'dns'
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import mongoose from 'mongoose'
 import interviewRouter from './routes/interview'
 import resumeRouter from './routes/resume'
 import problemsRouter from './routes/problems'
 // @ts-ignore
 import contestRouter from './routes/contests'
+import authRouter from './routes/auth'
+import userRouter from './routes/user'
+
 dotenv.config()
 
 // Some networks (campus/corporate) blackhole outbound IPv6 while allowing
@@ -24,10 +28,20 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'PrepAI server running' })
 })
 
+app.use('/api/auth', authRouter)
+app.use('/api/user', userRouter)
 app.use('/api/interview', interviewRouter)
 app.use('/api/resume', resumeRouter)
 app.use('/api/problems', problemsRouter)
 app.use('/api/contests', contestRouter)
 
 const PORT = process.env.PORT || 3001
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/prepai')
+  .then(() => {
+    console.log('Connected to MongoDB');
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch(err => {
+    console.error('Failed to connect to MongoDB', err);
+  });

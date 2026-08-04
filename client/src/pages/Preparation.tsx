@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '../lib/api'
 import { Upload, Loader, CheckCircle, XCircle, AlertCircle, BookOpen, TrendingUp } from 'lucide-react'
 
 interface Analysis {
@@ -30,7 +30,7 @@ export default function Preparation() {
     const formData = new FormData()
     formData.append('resume', file)
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/resume/upload`, formData)
+      const res = await api.post(`/resume/upload`, formData)
       setResumeText(res.data.resumeText)
     } catch {
       alert('Failed to parse PDF')
@@ -42,7 +42,7 @@ export default function Preparation() {
     if (!resumeText || !targetRole) return
     setLoading(true)
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/resume/analyze`, {
+      const res = await api.post(`/resume/analyze`, {
         resumeText, targetRole, targetCompany
       })
       setAnalysis(res.data.analysis)

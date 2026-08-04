@@ -1,9 +1,11 @@
 import { Router } from 'express'
-import { createClient } from '@supabase/supabase-js'
 import { executeCode } from '../services/executor'
+import { Contest, ContestParticipant, ContestSubmission } from '../models/Contest'
+import { Problem } from '../models/Problem'
+import { User } from '../models/User'
+import { authenticate, AuthRequest } from '../middleware/auth'
 
 const router = Router()
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
 
 function normalizeInput(input: any): string {
   if (!input) return ''
@@ -27,12 +29,8 @@ function fuzzyMatch(actual: string, expected: string): boolean {
 // Get all contests
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('contests')
-      .select('*')
-      .order('start_time', { ascending: false })
-    if (error) throw error
-    res.json({ contests: data })
+    const contests = await Contest.find().sort({ start_time: -1 })
+    res.json({ contests })
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch contests' })
   }
@@ -41,22 +39,15 @@ router.get('/', async (req, res) => {
 // Get single contest with problems
 router.get('/:id', async (req, res) => {
   try {
-    const { data: contest, error } = await supabase
-      .from('contests')
-      .select('*')
-      .eq('id', req.params.id)
-      .single()
-    if (error) throw error
+    const contest = await Contest.findById(req.params.id)
+    if (!contest) return res.status(404).json({ error: 'Contest not found' })
 
     // Fetch problems
-    const { data: problems } = await supabase
-      .from('problems_bank')
-      .select('id, title, slug, difficulty, topics')
-      .in('id', contest.problem_ids || [])
+    const problems = await Problem.find({ _id: { $in: contest.problems } }).select('id title slug difficulty category')
 
     // Sort by difficulty
     const sorted = (problems || []).sort((a: any, b: any) => {
-      const order: any = { easy: 1, medium: 2, hard: 3 }
+      const order: any = { Easy: 1, Medium: 2, Hard: 3 }
       return order[a.difficulty] - order[b.difficulty]
     })
 
@@ -67,13 +58,17 @@ router.get('/:id', async (req, res) => {
 })
 
 // Join contest
-router.post('/:id/join', async (req, res) => {
+router.post('/:id/join', authenticate, async (req: AuthRequest, res) => {
   try {
-    const { userId } = req.body
-    const { error } = await supabase
-      .from('contest_participants')
-      .upsert({ user_id: userId, contest_id: req.params.id })
-    if (error) throw error
+    const userId = req.user?.id
+    const contestId = req.params.id
+
+    let participant = await ContestParticipant.findOne({ user_id: userId, contest_id: contestId })
+    if (!participant) {
+      participant = new ContestParticipant({ user_id: userId, contest_id: contestId })
+      await participant.save()
+    }
+
     res.json({ success: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to join contest' })
@@ -81,9 +76,11 @@ router.post('/:id/join', async (req, res) => {
 })
 
 // Submit solution during contest
-router.post('/:id/submit', async (req, res) => {
+router.post('/:id/submit', authenticate, async (req: AuthRequest, res) => {
   try {
-    const { userId, problemId, code, language, testCases, problemTitle, startTime } = req.body
+    const { problemId, code, language, testCases, startTime } = req.body
+    const userId = req.user?.id
+    const contestId = req.params.id
     const results = []
     let allPassed = true
 
@@ -102,36 +99,29 @@ router.post('/:id/submit', async (req, res) => {
       })
     }
 
-    const status = allPassed ? 'accepted' : 'wrong_answer'
+    const status = allPassed ? 'Accepted' : 'Wrong Answer'
     const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0
     const score = allPassed ? Math.max(100 - Math.floor(timeTaken / 60), 10) : 0
 
     // Save submission
-    await supabase.from('contest_submissions').insert({
+    const submission = new ContestSubmission({
       user_id: userId,
-      contest_id: req.params.id,
+      contest_id: contestId,
       problem_id: problemId,
-      code, language, status, score,
-      time_taken: timeTaken,
+      code, language, status, score
     })
+    await submission.save()
 
     // Update participant score if accepted
     if (allPassed) {
-      const { data: existing } = await supabase
-        .from('contest_participants')
-        .select('total_score')
-        .eq('user_id', userId)
-        .eq('contest_id', req.params.id)
-        .single()
-
-      await supabase
-        .from('contest_participants')
-        .update({ total_score: (existing?.total_score || 0) + score })
-        .eq('user_id', userId)
-        .eq('contest_id', req.params.id)
+      const participant = await ContestParticipant.findOne({ user_id: userId, contest_id: contestId })
+      if (participant) {
+        participant.score = (participant.score || 0) + score
+        await participant.save()
+      }
     }
 
-    res.json({ status, results, score })
+    res.json({ status: status.toLowerCase().replace(' ', '_'), results, score })
   } catch (err) {
     console.error('Contest submit error:', err)
     res.status(500).json({ error: 'Failed to submit' })
@@ -141,30 +131,36 @@ router.post('/:id/submit', async (req, res) => {
 // Get leaderboard
 router.get('/:id/leaderboard', async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('contest_participants')
-      .select('user_id, total_score, joined_at, profiles(username, email)')
-      .eq('contest_id', req.params.id)
-      .order('total_score', { ascending: false })
-    if (error) throw error
-    res.json({ leaderboard: data })
+    const participants = await ContestParticipant.find({ contest_id: req.params.id })
+      .populate('user_id', 'username email')
+      .sort({ score: -1 })
+      
+    // Transform to match old format
+    const leaderboard = participants.map(p => ({
+      user_id: p.user_id._id,
+      total_score: p.score,
+      joined_at: p.joined_at,
+      profiles: {
+        username: (p.user_id as any).username,
+        email: (p.user_id as any).email
+      }
+    }))
+
+    res.json({ leaderboard })
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch leaderboard' })
   }
 })
+
 // Create contest (admin only)
-router.post('/create', async (req, res) => {
+router.post('/create', authenticate, async (req: AuthRequest, res) => {
   try {
-    const { title, description, startTime, userId } = req.body
+    const { title, description, startTime } = req.body
+    const userId = req.user?.id
 
     // Check admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', userId)
-      .single()
-
-    if (!profile?.is_admin) {
+    const user = await User.findById(userId)
+    if (!user?.is_admin) {
       return res.status(403).json({ error: 'Not authorized' })
     }
 
@@ -174,52 +170,32 @@ router.post('/create', async (req, res) => {
     const status = start <= now ? 'active' : 'upcoming'
 
     // Pick 4 problems — 1 easy, 2 medium, 1 hard
-    const { data: easy } = await supabase
-      .from('problems_bank')
-      .select('id')
-      .eq('difficulty', 'easy')
-      .eq('status', 'approved')
-      .limit(20)
-
-    const { data: medium } = await supabase
-      .from('problems_bank')
-      .select('id')
-      .eq('difficulty', 'medium')
-      .eq('status', 'approved')
-      .limit(20)
-
-    const { data: hard } = await supabase
-      .from('problems_bank')
-      .select('id')
-      .eq('difficulty', 'hard')
-      .eq('status', 'approved')
-      .limit(20)
+    const easy = await Problem.find({ difficulty: 'Easy' }).limit(20)
+    const medium = await Problem.find({ difficulty: 'Medium' }).limit(20)
+    const hard = await Problem.find({ difficulty: 'Hard' }).limit(20)
 
     const pick = (arr: any[], n: number) => {
       const shuffled = [...(arr || [])].sort(() => Math.random() - 0.5)
-      return shuffled.slice(0, n).map((p: any) => p.id)
+      return shuffled.slice(0, n).map((p: any) => p._id)
     }
 
     const problemIds = [
-      ...pick(easy || [], 1),
-      ...pick(medium || [], 2),
-      ...pick(hard || [], 1),
+      ...pick(easy, 1),
+      ...pick(medium, 2),
+      ...pick(hard, 1),
     ]
 
-    const { data: contest, error } = await supabase
-      .from('contests')
-      .insert({
-        title,
-        description: description || `${title} — 4 problems, 90 minutes`,
-        start_time: start.toISOString(),
-        end_time: end.toISOString(),
-        status,
-        problem_ids: problemIds,
-      })
-      .select()
-      .single()
+    const contest = new Contest({
+      title,
+      description: description || `${title} — 4 problems, 90 minutes`,
+      start_time: start,
+      end_time: end,
+      status,
+      problems: problemIds,
+    })
+    
+    await contest.save()
 
-    if (error) throw error
     res.json({ contest })
   } catch (err) {
     console.error('Create contest error:', err)
@@ -230,10 +206,24 @@ router.post('/create', async (req, res) => {
 // Sync contest statuses
 router.post('/sync', async (req, res) => {
   try {
-    await supabase.rpc('update_contest_status')
+    const now = new Date()
+    
+    // Update upcoming to active
+    await Contest.updateMany(
+      { status: 'upcoming', start_time: { $lte: now } },
+      { $set: { status: 'active' } }
+    )
+    
+    // Update active to completed
+    await Contest.updateMany(
+      { status: 'active', end_time: { $lte: now } },
+      { $set: { status: 'completed' } }
+    )
+
     res.json({ success: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to sync' })
   }
 })
+
 export default router

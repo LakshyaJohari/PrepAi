@@ -2,30 +2,17 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Sun, Moon } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
-import { supabase } from '../../lib/supabase'
 import Logo from '../ui/Logo'
 import Sidebar from './Sidebar'
 export default function Navbar() {
   const { user, theme, toggleTheme } = useAuthStore()
   const navigate = useNavigate()
   const [streak, setStreak] = useState(0)
-  const [streakActive, setStreakActive] = useState(false)
+  const streakActive = streak > 0
 
   useEffect(() => {
-    const fetchStreak = async () => {
-      if (!user) return
-      const { data } = await supabase
-        .from('profiles')
-        .select('streak, last_solved')
-        .eq('id', user.id)
-        .single()
-      if (data) {
-        setStreak(data.streak || 0)
-        const today = new Date().toISOString().split('T')[0]
-        setStreakActive(data.last_solved === today)
-      }
-    }
-    fetchStreak()
+    if (!user) return
+    setStreak(user.streak || 0)
   }, [user])
 
   const displayName = user?.name || user?.email?.split('@')[0] || '?'

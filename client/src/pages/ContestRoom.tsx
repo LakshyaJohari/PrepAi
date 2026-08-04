@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../lib/api'
 import Editor from '@monaco-editor/react'
 import { useAuthStore } from '../store/authStore'
 import { Trophy, Clock, CheckCircle, XCircle, ChevronLeft, Send, Play } from 'lucide-react'
@@ -110,7 +110,7 @@ export default function ContestRoom() {
   useEffect(() => {
     const fetchContest = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/contests/${id}`)
+        const res = await api.get(`/contests/${id}`)
         setContest(res.data.contest)
         setProblems(res.data.problems)
         if (res.data.problems.length > 0) {
@@ -129,14 +129,14 @@ export default function ContestRoom() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/contests/${id}/leaderboard`)
+      const res = await api.get(`/contests/${id}/leaderboard`)
       setLeaderboard(res.data.leaderboard || [])
     } catch {}
   }
 
   const joinContest = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/contests/${id}/join`, { userId: user?.id })
+      await api.post(`/contests/${id}/join`, { userId: user?.id })
       setJoined(true)
     } catch {}
   }
@@ -146,7 +146,7 @@ export default function ContestRoom() {
       setSelectedProblem(p)
     } else {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/problems/${p.slug}`)
+        const res = await api.get(`/problems/${p.slug}`)
         setSelectedProblem(res.data.problem)
       } catch {}
     }
@@ -162,8 +162,8 @@ export default function ContestRoom() {
     setResults([])
     setBottomTab('result')
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/problems/${selectedProblem.id}/run`,
+      const res = await api.post(
+        `/problems/${selectedProblem.id}/run`,
         { code, language, testCases: selectedProblem.test_cases?.slice(0, 2) }
       )
       setResults(res.data.results || [])
@@ -177,8 +177,8 @@ export default function ContestRoom() {
     setSubmitting(true)
     setBottomTab('result')
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/contests/${id}/submit`,
+      const res = await api.post(
+        `/contests/${id}/submit`,
         {
           userId: user.id,
           problemId: selectedProblem.id,

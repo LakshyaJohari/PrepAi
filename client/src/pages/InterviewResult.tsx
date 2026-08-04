@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../lib/api";
 import { useAuthStore } from "../store/authStore";
 import {
@@ -32,36 +32,41 @@ interface ScoredTurn {
   feedback: Feedback;
 }
 
-export default function InterviewScore() {
-  const { state } = useLocation();
+export default function InterviewResult() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { turns, company, role, roundType, difficulty } = state || {};
   const [scores, setScores] = useState<ScoredTurn[]>([]);
+  const [config, setConfig] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(0);
 
   useEffect(() => {
-    const fetchScores = async () => {
+    const fetchInterview = async () => {
       try {
-        const res = await api.post(
-          '/interview/score',
-          {
-            turns,
-            role,
-            company,
-            roundType,
-            difficulty,
-          },
-        );
-        setScores(res.data.scores);
+        const res = await api.get(`/interview/${id}`);
+        const { interview } = res.data;
+        setConfig(interview.config || {});
+        
+        // Reconstruct scores from transcript
+        const transcript = interview.transcript || [];
+        const reconstructedScores = [];
+        for (let i = 0; i < transcript.length; i += 2) {
+          reconstructedScores.push({
+            question: transcript[i].content,
+            feedback: transcript[i].ai_feedback,
+            answer: transcript[i+1]?.content || ''
+          });
+        }
+        setScores(reconstructedScores);
       } catch {
-        alert("Failed to score interview");
+        alert("Failed to load interview");
+        navigate('/profile');
       }
       setLoading(false);
     };
-    if (turns?.length) fetchScores();
-  }, []);
+    if (id) fetchInterview();
+  }, [id, navigate]);
 
   const avgScore = scores.length
     ? Math.round(
@@ -100,7 +105,7 @@ export default function InterviewScore() {
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Interview Report</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            {company} · {role} · {roundType?.replace("_", " ")}
+            {config.company} · {config.role} · {config.roundType?.replace("_", " ")}
           </p>
         </div>
         <div className="text-center">

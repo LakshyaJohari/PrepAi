@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import api from "../lib/api";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import {
@@ -132,26 +132,32 @@ function AnalyticsSection({ userId }: { userId: string }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: s } = await supabase
-        .from("sessions")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: true });
-      const { data: p } = await supabase
-        .from("problems")
-        .select("*")
-        .eq("user_id", userId)
-        .order("solved_at", { ascending: true });
-      const { data: t } = await supabase
-        .from("turns")
-        .select("ai_feedback, session_id");
-      setSessions(s || []);
-      setProblems(p || []);
-      setTurns(t || []);
-      setLoaded(true);
-    };
-    fetchData();
-  }, [userId]);
+      try {
+        const [histRes, analyticsRes] = await Promise.all([
+          api.get('/user/history'),
+          api.get('/user/analytics')
+        ])
+        
+        setSessions(analyticsRes.data.sessions || [])
+        setTurns(analyticsRes.data.turns || [])
+        
+        setProblems(histRes.data.submissions.map((s: any) => ({
+          id: s.id,
+          title: s.problem || 'Unknown Problem',
+          platform: 'PrepAI',
+          difficulty: s.difficulty || 'Medium',
+          topic: s.language || 'Code',
+          time_taken: null,
+          notes: s.status,
+          solved_at: s.created_at
+        })))
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err)
+      }
+      setLoaded(true)
+    }
+    fetchData()
+  }, [userId])
 
   if (!loaded)
     return (
@@ -206,39 +212,61 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return;
-      const { data: p } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      const { data: s } = await supabase
-        .from("sessions")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      const { data: pr } = await supabase
-        .from("problems")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("solved_at", { ascending: false });
-      setProfile(p);
-      setNewUsername(p?.username || user.email?.split("@")[0] || "");
-      setSessions(s || []);
-      setProblems(pr || []);
-      setLoading(false);
-    };
-    fetchData();
-  }, [user]);
+      if (!user) return
+      try {
+        const [profileRes, histRes] = await Promise.all([
+          api.get('/user/profile'),
+          api.get('/user/history')
+        ])
+
+        const p = profileRes.data.profile
+        setProfile({
+          username: p.username,
+          email: p.email,
+          streak: p.streak,
+          best_streak: p.best_streak,
+          last_solved: p.last_solved,
+          created_at: p.createdAt
+        })
+        setNewUsername(p.username || user.email?.split("@")[0] || "")
+
+        setSessions(histRes.data.interviews.map((i: any) => ({
+          id: i._id,
+          company: i.config?.company || 'Unknown',
+          role: i.config?.role || 'Unknown',
+          round_type: i.config?.roundType || 'General',
+          difficulty: i.config?.difficulty || 'Medium',
+          overall_score: i.score,
+          created_at: i.createdAt
+        })))
+
+        setProblems(histRes.data.submissions.map((s: any) => ({
+          id: s.id,
+          title: s.problem || 'Unknown Problem',
+          platform: 'PrepAI',
+          difficulty: s.difficulty || 'Medium',
+          topic: s.language || 'Code',
+          time_taken: null,
+          notes: s.status,
+          solved_at: s.created_at
+        })))
+      } catch (err) {
+        console.error('Failed to fetch profile data:', err)
+      }
+      setLoading(false)
+    }
+    fetchData()
+  }, [user])
 
   const handleSaveUsername = async () => {
-    await supabase
-      .from("profiles")
-      .update({ username: newUsername })
-      .eq("id", user?.id);
-    setProfile((prev) => (prev ? { ...prev, username: newUsername } : prev));
-    setEditing(false);
-  };
+    try {
+      await api.put('/user/profile', { username: newUsername })
+      setProfile((prev) => (prev ? { ...prev, username: newUsername } : prev))
+    } catch (err) {
+      console.error('Failed to update username', err)
+    }
+    setEditing(false)
+  }
 
   const handleLogout = async () => {
     await logout();
@@ -501,10 +529,11 @@ export default function Profile() {
                   View all →
                 </button>
               </div>
-              {sessions.slice(0, 5).map((s) => (
+              {sessions.slice(0, 3).map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between py-3 border-b border-[var(--border-subtle)] last:border-0"
+                  onClick={() => navigate(`/interview/result/${s.id}`)}
+                  className="flex items-center justify-between py-3 px-3 -mx-3 rounded-[var(--radius-md)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors border-b border-[var(--border-subtle)] last:border-0"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-[var(--text-muted)] w-20">
@@ -547,7 +576,8 @@ export default function Profile() {
                 {sessions.map((s) => (
                   <div
                     key={s.id}
-                    className="flex items-center justify-between py-3 border-b border-[var(--border-subtle)] last:border-0"
+                    onClick={() => navigate(`/interview/result/${s.id}`)}
+                    className="flex items-center justify-between py-3 px-3 -mx-3 rounded-[var(--radius-md)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors border-b border-[var(--border-subtle)] last:border-0"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-xs text-[var(--text-muted)] w-20">
@@ -661,10 +691,7 @@ export default function Profile() {
                       ) as HTMLInputElement;
                       const newName = input.value.trim();
                       if (!newName) return;
-                      await supabase
-                        .from("profiles")
-                        .update({ username: newName })
-                        .eq("id", user?.id);
+                      await api.put('/user/profile', { username: newName })
                       setProfile((prev) =>
                         prev ? { ...prev, username: newName } : prev,
                       );

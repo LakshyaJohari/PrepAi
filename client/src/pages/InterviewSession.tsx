@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../lib/api'
 import { Mic, MicOff, Send } from 'lucide-react'
 
 interface Turn {
@@ -68,7 +68,7 @@ export default function InterviewSession() {
     }
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/interview/answer`, {
+      const res = await api.post('/interview/answer', {
         sessionId, answer, company, role, roundType, difficulty: difficulty.toLowerCase()
       })
       setCurrentQuestion(res.data.question)

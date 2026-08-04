@@ -2,8 +2,7 @@ import { useAuthStore } from '../store/authStore'
 import { Mic, ArrowRight, Trophy, Code, Calendar, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-import axios from 'axios'
+import api from '../lib/api'
 
 interface Session {
   id: string
@@ -87,49 +86,31 @@ export default function Dashboard() {
 
       // Sync contest statuses
       try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/contests/sync`)
+        await api.post('/contests/sync')
       } catch {}
 
-      // Fetch recent sessions
-      const { data: s } = await supabase
-        .from('sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(3)
-      setSessions(s || [])
-
-      // Fetch profile streak
-      const { data: p } = await supabase
-        .from('profiles')
-        .select('streak')
-        .eq('id', user.id)
-        .single()
-      setStreak(p?.streak || 0)
-
-      // Fetch problem count
-      const { count } = await supabase
-        .from('problems')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-      setProblemCount(count || 0)
-
-      // Fetch daily problem
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/problems/daily`)
-        setDailyProblem(res.data.problem)
-      } catch {
-        const { data: pb } = await supabase
-          .from('problems_bank')
-          .select('id, title, slug, difficulty, topics, companies')
-          .limit(1)
-          .single()
-        setDailyProblem(pb)
+        // Fetch dashboard data
+        const { data } = await api.get('/user/dashboard');
+        setStreak(data.stats.streak);
+        setProblemCount(data.stats.solved);
+        setSessions(data.recentSessions || []);
+
+        try {
+          const res = await api.get('/problems/daily')
+          setDailyProblem(res.data.problem)
+        } catch {
+          if (data.recentProblems && data.recentProblems.length > 0) {
+            setDailyProblem(data.recentProblems[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
       }
 
       // Fetch contests
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/contests`)
+        const res = await api.get('/contests')
         const contests: Contest[] = res.data.contests || []
         setActiveContest(contests.find(c => c.status === 'active') || null)
         setUpcomingContest(contests.find(c => c.status === 'upcoming') || null)

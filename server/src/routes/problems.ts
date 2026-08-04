@@ -1,13 +1,12 @@
 import { Router } from "express";
-import { createClient } from "@supabase/supabase-js";
 import { generateText } from "../services/gemini";
 import { executeCode } from "../services/executor";
+import { Problem } from "../models/Problem";
+import { Submission } from "../models/Submission";
+import { User } from "../models/User";
+import { authenticate, AuthRequest } from "../middleware/auth";
 
 const router = Router();
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!,
-);
 
 function normalizeInput(input: any): string {
   if (!input) return "";
@@ -46,40 +45,31 @@ function fuzzyMatch(actual: string, expected: string): boolean {
 
   return false;
 }
+
 // Get all problems with filters
 router.get("/", async (req, res) => {
   try {
     const { company, topic, difficulty, search } = req.query;
-    let query = supabase
-      .from("problems_bank")
-      .select("id, title, slug, difficulty, companies, topics, created_at")
-      .eq("status", "approved");
+    
+    let filter: any = {};
+    if (difficulty) filter.difficulty = difficulty;
+    if (company) filter.category = new RegExp(company as string, 'i'); // Or create a separate companies field
+    if (topic) filter.category = new RegExp(topic as string, 'i'); 
+    if (search) filter.title = new RegExp(search as string, 'i');
 
-    if (difficulty) query = query.eq("difficulty", difficulty);
-    if (company) query = query.contains("companies", [company]);
-    if (topic) query = query.contains("topics", [topic]);
-    if (search) query = query.ilike("title", `%${search}%`);
-
-    const { data, error } = await query.order("created_at", {
-      ascending: true,
-    });
-    if (error) throw error;
-    res.json({ problems: data });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch problems" });
+    filter.status = { $ne: 'pending' };
+    const problems = await Problem.find(filter).select("id title slug difficulty category createdAt").sort({ createdAt: 1 });
+    res.json({ problems });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch daily problem" });
   }
 });
 
-// Get daily problem
+// Get daily problem (mock logic for now, gets first problem or random)
 router.get("/daily", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("daily_problem")
-      .select("id, title, slug, difficulty, topics, companies")
-      .single();
-    if (error) throw error;
-    res.json({ problem: data });
+    const problem = await Problem.findOne().select("id title slug difficulty category");
+    res.json({ problem });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch daily problem" });
   }
@@ -88,13 +78,9 @@ router.get("/daily", async (req, res) => {
 // Get single problem by slug
 router.get("/:slug", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("problems_bank")
-      .select("*")
-      .eq("slug", req.params.slug)
-      .single();
-    if (error) throw error;
-    res.json({ problem: data });
+    const problem = await Problem.findOne({ slug: req.params.slug });
+    if (!problem) return res.status(404).json({ error: "Problem not found" });
+    res.json({ problem });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch problem" });
   }
@@ -108,12 +94,8 @@ router.post("/:id/run", async (req, res) => {
 
     for (const tc of testCases.slice(0, 2)) {
       const normalizedInput = String(tc.input || "").trim();
-      console.log("Input:", normalizedInput);
-
       const result = await executeCode(code, language, normalizedInput);
-      console.log("Output:", result.stdout);
-      console.log("Error:", result.stderr || result.error);
-
+      
       const actualOutput = result.stdout?.trim() || "";
       const expectedOutput = normalizeOutput(tc.expected_output?.trim() || "");
       const passed = fuzzyMatch(
@@ -137,9 +119,10 @@ router.post("/:id/run", async (req, res) => {
 });
 
 // Submit solution
-router.post("/:id/submit", async (req, res) => {
+router.post("/:id/submit", authenticate, async (req: AuthRequest, res) => {
   try {
-    const { code, language, userId, testCases, problemTitle } = req.body;
+    const { code, language, testCases, problemTitle } = req.body;
+    const userId = req.user?.id;
     const results = [];
     let allPassed = true;
 
@@ -165,72 +148,48 @@ router.post("/:id/submit", async (req, res) => {
       });
     }
 
-    const status = allPassed ? "accepted" : "wrong_answer";
+    const status = allPassed ? "Accepted" : "Wrong Answer";
 
     // Save submission
-    await supabase.from("submissions").insert({
+    const submission = new Submission({
       user_id: userId,
       problem_id: req.params.id,
-      problem_title: problemTitle,
       code,
       language,
       status,
     });
+    await submission.save();
 
     // Update streak if accepted
     if (allPassed && userId) {
       const today = new Date().toISOString().split("T")[0];
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("streak, last_solved, best_streak")
-        .eq("id", userId)
-        .single();
+      const user = await User.findById(userId);
 
-      if (profile) {
+      if (user) {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toISOString().split("T")[0];
-        let newStreak = profile.streak || 0;
+        let newStreak = user.streak || 0;
 
-        if (profile.last_solved === today) {
+        if (user.last_solved === today) {
           // already solved today
-        } else if (profile.last_solved === yesterdayStr) {
+        } else if (user.last_solved === yesterdayStr) {
           newStreak += 1;
         } else {
           newStreak = 1;
         }
 
-        await supabase
-          .from("profiles")
-          .update({
-            streak: newStreak,
-            last_solved: today,
-            best_streak: Math.max(newStreak, profile.best_streak || 0),
-          })
-          .eq("id", userId);
+        user.streak = newStreak;
+        user.last_solved = today;
+        user.best_streak = Math.max(newStreak, user.best_streak || 0);
+        await user.save();
       }
     }
 
     // AI feedback if accepted
     let aiFeedback = null;
     if (allPassed) {
-      const aiPrompt = `Analyze this ${language} solution for "${problemTitle}":
-
-\`\`\`${language}
-${code}
-\`\`\`
-
-Return ONLY valid JSON:
-{
-  "timeComplexity": "O(?)",
-  "spaceComplexity": "O(?)",
-  "approach": "brief description",
-  "strengths": ["strength 1", "strength 2"],
-  "improvements": ["improvement 1", "improvement 2"],
-  "optimalApproach": "optimal solution description",
-  "optimalComplexity": "O(?)",
-  "tips": ["tip 1", "tip 2"]
-}`;
+      const aiPrompt = `Analyze this ${language} solution for "${problemTitle}":\n\n\`\`\`${language}\n${code}\n\`\`\`\n\nReturn ONLY valid JSON:\n{\n  "timeComplexity": "O(?)",\n  "spaceComplexity": "O(?)",\n  "approach": "brief description",\n  "strengths": ["strength 1", "strength 2"],\n  "improvements": ["improvement 1", "improvement 2"],\n  "optimalApproach": "optimal solution description",\n  "optimalComplexity": "O(?)",\n  "tips": ["tip 1", "tip 2"]\n}`;
 
       try {
         const aiText = await generateText(aiPrompt);
@@ -241,10 +200,37 @@ Return ONLY valid JSON:
       }
     }
 
-    res.json({ status, results, aiFeedback });
+    res.json({ status: status.toLowerCase().replace(' ', '_'), results, aiFeedback });
   } catch (err) {
     console.error("Submit error:", err);
-    res.status(500).json({ error: "Failed to submit" });
+    res.status(500).json({ error: 'Server error analyzing code' });
+  }
+});
+
+// Contribute a problem
+router.post('/', authenticate, async (req: AuthRequest, res) => {
+  try {
+    const { title, slug, difficulty, description, constraints, examples, test_cases, hints, topics, companies } = req.body;
+    const newProblem = new Problem({
+      title,
+      slug,
+      difficulty: difficulty.charAt(0).toUpperCase() + difficulty.slice(1),
+      category: topics && topics.length > 0 ? topics[0] : 'General',
+      description,
+      constraints,
+      examples,
+      test_cases,
+      hints,
+      topics,
+      companies,
+      status: 'pending',
+      contributed_by: req.user?.id
+    });
+    await newProblem.save();
+    res.status(201).json({ problem: newProblem });
+  } catch (error) {
+    console.error('Contribute error:', error);
+    res.status(500).json({ error: 'Server error saving problem contribution' });
   }
 });
 

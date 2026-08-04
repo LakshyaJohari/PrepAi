@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../lib/supabase'
+import api from '../lib/api'
 import { useAuthStore } from '../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
@@ -90,7 +90,7 @@ export default function Contribute() {
     if (!user) return
     setSubmitting(true)
     try {
-      const { error } = await supabase.from('problems_bank').insert({
+      await api.post('/problems', {
         title: title.trim(),
         slug: slugify(title),
         difficulty,
@@ -101,10 +101,7 @@ export default function Contribute() {
         hints: hints.filter(h => h.trim()),
         topics: selectedTopics,
         companies: selectedCompanies,
-        contributed_by: user.id,
-        status: 'pending',
       })
-      if (error) throw error
       setSuccess(true)
     } catch (err) {
       alert('Failed to submit problem. Please try again.')
