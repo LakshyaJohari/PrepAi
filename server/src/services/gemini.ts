@@ -8,7 +8,7 @@ const groq = new Groq({
   maxRetries: 1,
 })
 
-const MODEL = 'llama-3.3-70b-versatile'
+const MODEL = process.env.GROQ_MODEL || 'qwen/qwen3.8-27b'
 
 // Generic text generation
 export async function generateText(prompt: string): Promise<string> {
@@ -23,6 +23,12 @@ export async function generateText(prompt: string): Promise<string> {
 
 // Parse JSON safely
 export function parseJSON<T>(text: string): T {
+  const firstBrace = text.indexOf('{')
+  const lastBrace = text.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace !== -1) {
+    const jsonSubstring = text.substring(firstBrace, lastBrace + 1)
+    return JSON.parse(jsonSubstring)
+  }
   const cleaned = text.replace(/```json|```/g, '').trim()
   return JSON.parse(cleaned)
 }

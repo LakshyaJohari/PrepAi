@@ -6,7 +6,7 @@ import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId="300155415762-25qg5k7imnj4tfn8ojpq7defg006kbpt.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "300155415762-25qg5k7imnj4tfn8ojpq7defg006kbpt.apps.googleusercontent.com"}>
       <App />
     </GoogleOAuthProvider>
   </StrictMode>,

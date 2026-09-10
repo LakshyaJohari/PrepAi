@@ -252,8 +252,8 @@ export default function ProblemSolver() {
     setBottomTab("result");
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/problems/${problem.id}/submit`,
+      const res = await api.post(
+        `/problems/${problem.id}/submit`,
         {
           code,
           language,

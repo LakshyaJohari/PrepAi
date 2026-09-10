@@ -15,9 +15,12 @@ dotenv.config()
 
 // Some networks (campus/corporate) blackhole outbound IPv6 while allowing
 // IPv4, which makes Node's fetch (undici) hang until timeout on APIs that
-// publish AAAA records (e.g. Groq, which sits behind Cloudflare). Prefer
-// IPv4 resolution so those requests don't race a dead IPv6 route first.
 dns.setDefaultResultOrder('ipv4first')
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1'])
+} catch (e) {
+  console.warn('Could not set custom DNS servers', e)
+}
 
 const app = express()
 
