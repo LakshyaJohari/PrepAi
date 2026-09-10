@@ -32,11 +32,17 @@ app.get('/health', (req, res) => {
 })
 
 app.use('/api/auth', authRouter)
+app.use('/auth', authRouter)
 app.use('/api/user', userRouter)
+app.use('/user', userRouter)
 app.use('/api/interview', interviewRouter)
+app.use('/interview', interviewRouter)
 app.use('/api/resume', resumeRouter)
+app.use('/resume', resumeRouter)
 app.use('/api/problems', problemsRouter)
+app.use('/problems', problemsRouter)
 app.use('/api/contests', contestRouter)
+app.use('/contests', contestRouter)
 
 const PORT = process.env.PORT || 3001
 
